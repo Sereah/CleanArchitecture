@@ -1,4 +1,7 @@
 package com.lunacattus.clean.presentation.features.home.mvi
 
-class HomeSideEffect {
+import com.lunacattus.clean.presentation.common.ui.base.ISideEffect
+
+sealed class HomeSideEffect : ISideEffect {
+
 }

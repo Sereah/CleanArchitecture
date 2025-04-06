@@ -13,7 +13,7 @@ class MessageConfirmDialog : BaseDialogFragment<DialogMessageConfirmBinding>(
     override fun setupView(savedInstanceState: Bundle?) {
         binding.text.text = text
         binding.btn.setOnClickListener {
-            dialogViewModel.emitResult(true)
+            dialogViewModel.emitResult("Hi, fragment.")
             dismiss()
         }
     }

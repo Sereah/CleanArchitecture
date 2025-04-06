@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">CleanArchApp</string>
+    <string name="feature_chat">Feature Weather</string>
+    <string name="paris">Paris</string>
+    <string name="june_07">June 07</string>
+    <string name="update_time">Updated as of %s</string>
+    <string name="weather_clear">Clear</string>
+    <string name="temperature_24">24</string>
+    <string name="temperature_unit">°C</string>
+    <string name="humidity">HUMIDITY</string>
+    <string name="wind">WIND</string>
+    <string name="feel">FEELS LIKE</string>
+    <string name="humidity_value">%d%%</string>
+    <string name="wind_value">%.2fkm/h</string>
+    <string name="feel_value">%d°</string>
 </resources>

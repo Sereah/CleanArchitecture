@@ -16,8 +16,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding, HomeUiIntent, HomeViewMod
     override val viewModel: HomeViewModel by viewModels()
 
     override fun setupViews(savedInstanceState: Bundle?) {
-        binding.btnResume.setOnClickListener {
-            dispatchUiIntent(HomeUiIntent.OnFeatureResumeRequested)
+        binding.btnFeatureChat.setOnClickListener {
+            dispatchUiIntent(HomeUiIntent.OnFeatureChatRequested)
         }
     }
 

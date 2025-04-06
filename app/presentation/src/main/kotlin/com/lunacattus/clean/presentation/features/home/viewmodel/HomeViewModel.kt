@@ -16,12 +16,12 @@ class HomeViewModel @Inject constructor() : BaseViewModel<HomeUiIntent>() {
 
     override fun handleUiIntent(intent: HomeUiIntent) {
         when (intent) {
-            HomeUiIntent.OnFeatureResumeRequested -> {
+            HomeUiIntent.OnFeatureChatRequested -> {
                 viewModelScope.launch {
                     emitNavCommand(
                         NavCommand.ToDirection(
                             object : NavDirections {
-                                override val actionId: Int = R.id.action_home_to_resume
+                                override val actionId: Int = R.id.action_home_to_chat
                                 override val arguments: Bundle = Bundle()
                             }
                         )

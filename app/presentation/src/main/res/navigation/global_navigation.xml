@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/global_navigation"
+    app:startDestination="@id/home_dest">
+
+    <fragment
+        android:id="@+id/home_dest"
+        android:name="com.lunacattus.clean.presentation.features.home.ui.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home">
+
+        <action
+            android:id="@+id/action_home_to_resume"
+            app:destination="@id/resume_navigation" />
+
+    </fragment>
+
+    <include app:graph="@navigation/resume_navigation" />
+
+    <dialog
+        android:id="@+id/dialog_message_confirm_dest"
+        android:name="com.lunacattus.clean.presentation.common.ui.dialog.MessageConfirmDialog"
+        android:label="dialog_message_confirm"
+        tools:layout="@layout/dialog_message_confirm" />
+</navigation>

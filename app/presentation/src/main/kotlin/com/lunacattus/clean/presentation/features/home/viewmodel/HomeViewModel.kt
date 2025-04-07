@@ -1,33 +1,32 @@
 package com.lunacattus.clean.presentation.features.home.viewmodel
 
-import android.os.Bundle
-import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavDirections
-import com.lunacattus.clean.presentation.R
-import com.lunacattus.clean.presentation.common.navigation.NavCommand
+import com.lunacattus.clean.common.Logger
 import com.lunacattus.clean.presentation.common.ui.base.BaseViewModel
+import com.lunacattus.clean.presentation.features.home.mvi.HomeSideEffect
 import com.lunacattus.clean.presentation.features.home.mvi.HomeUiIntent
+import com.lunacattus.clean.presentation.features.home.mvi.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor() : BaseViewModel<HomeUiIntent>() {
+class HomeViewModel @Inject constructor() :
+    BaseViewModel<HomeUiIntent, HomeUiState, HomeSideEffect>() {
 
-    override fun handleUiIntent(intent: HomeUiIntent) {
+    init {
+        Logger.d(TAG, "init.")
+    }
+
+    override val initUiState: HomeUiState get() = HomeUiState()
+
+    override suspend fun processUiIntent(intent: HomeUiIntent) {
         when (intent) {
             HomeUiIntent.OnFeatureChatRequested -> {
-                viewModelScope.launch {
-                    emitNavCommand(
-                        NavCommand.ToDirection(
-                            object : NavDirections {
-                                override val actionId: Int = R.id.action_home_to_chat
-                                override val arguments: Bundle = Bundle()
-                            }
-                        )
-                    )
-                }
+                sendSideEffect(HomeSideEffect.NavigateToWeatherFeature)
             }
         }
+    }
+
+    companion object {
+        const val TAG = "HomeViewModel"
     }
 }

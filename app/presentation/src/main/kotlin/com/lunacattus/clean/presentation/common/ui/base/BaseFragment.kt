@@ -7,16 +7,23 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewbinding.ViewBinding
 import com.lunacattus.clean.presentation.common.di.NavCoordinatorEntryPoint
 import com.lunacattus.clean.presentation.common.navigation.NavCoordinator
 import com.lunacattus.clean.presentation.common.ui.dialog.DialogShareViewModel
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 
-abstract class BaseFragment<VB : ViewBinding, INTENT : IUiIntent, VM : BaseViewModel<INTENT>>(
+abstract class BaseFragment<
+        VB : ViewBinding,
+        INTENT : IUiIntent,
+        STATE : IUiState,
+        EFFECT : ISideEffect,
+        VM : BaseViewModel<INTENT, STATE, EFFECT>>(
     private val inflateBinding: (LayoutInflater, ViewGroup?, Boolean) -> VB
 ) : Fragment() {
 
@@ -38,7 +45,7 @@ abstract class BaseFragment<VB : ViewBinding, INTENT : IUiIntent, VM : BaseViewM
         super.onViewCreated(view, savedInstanceState)
         setupViews(savedInstanceState)
         setupObservers()
-        observeNavEvents()
+        observeSideEffect()
     }
 
     override fun onDestroyView() {
@@ -46,9 +53,36 @@ abstract class BaseFragment<VB : ViewBinding, INTENT : IUiIntent, VM : BaseViewM
         super.onDestroyView()
     }
 
-    abstract fun setupViews(savedInstanceState: Bundle?)
+    protected abstract fun setupViews(savedInstanceState: Bundle?)
+    protected abstract fun setupObservers()
+    protected abstract fun handleSideEffect(effect: EFFECT)
 
-    abstract fun setupObservers()
+    protected fun <T> observeUiState(
+        selector: (STATE) -> T,
+        useDistinct: Boolean = true,
+        action: (T) -> Unit
+    ) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                val flow = viewModel.uiState
+                    .mapNotNull { selector(it) }
+                if (useDistinct) {
+                    flow.distinctUntilChanged()
+                }
+                flow.collect { value -> action(value) }
+            }
+        }
+    }
+
+    private fun observeSideEffect() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.sideEffect.collect { effect ->
+                    handleSideEffect(effect)
+                }
+            }
+        }
+    }
 
     protected fun dispatchUiIntent(intent: INTENT) {
         viewModel.handleUiIntent(intent)
@@ -56,17 +90,7 @@ abstract class BaseFragment<VB : ViewBinding, INTENT : IUiIntent, VM : BaseViewM
 
     protected fun dialogResultState() = dialogViewModel.resultState
 
-    private fun observeNavEvents() {
-        lifecycleScope.launch {
-            viewModel.navEvents
-                .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
-                .collect { command ->
-                    getNavCoordinator().execute(command)
-                }
-        }
-    }
-
-    private fun getNavCoordinator(): NavCoordinator {
+    protected fun getNavCoordinator(): NavCoordinator {
         val entryPoint = EntryPointAccessors.fromActivity(
             requireActivity(),
             NavCoordinatorEntryPoint::class.java

@@ -1,19 +1,35 @@
 package com.lunacattus.clean.presentation.common.ui.base
 
 import androidx.lifecycle.ViewModel
-import com.lunacattus.clean.presentation.common.navigation.NavCommand
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 
-abstract class BaseViewModel<INTENT : IUiIntent> : ViewModel() {
+abstract class BaseViewModel<INTENT : IUiIntent, STATE : IUiState, EFFECT : ISideEffect> :
+    ViewModel() {
 
-    private val _navEvents = Channel<NavCommand>()
-    val navEvents: Flow<NavCommand> = _navEvents.receiveAsFlow()
+    private val _uiState = MutableStateFlow<STATE>(initUiState)
+    val uiState = _uiState.asStateFlow()
 
-    abstract fun handleUiIntent(intent: INTENT)
+    private val _effect = Channel<EFFECT>(Channel.BUFFERED)
+    val sideEffect = _effect.receiveAsFlow()
 
-    protected suspend fun emitNavCommand(event: NavCommand) {
-        _navEvents.send(event)
+    abstract val initUiState: STATE
+
+    abstract suspend fun processUiIntent(intent: INTENT)
+
+    fun handleUiIntent(intent: INTENT) {
+        viewModelScope.launch {
+            processUiIntent(intent)
+        }
+    }
+
+    protected fun sendSideEffect(effect: EFFECT) {
+        viewModelScope.launch {
+            _effect.send(effect)
+        }
     }
 }

@@ -1,0 +1,38 @@
+import os
+
+# 定义不同密度的缩放比例
+density_ratios = {
+    "ldpi": 0.75,  # 120dpi
+    "mdpi": 1.0,   # 160dpi
+    "hdpi": 1.5,   # 240dpi
+    "xhdpi": 2.0,  # 320dpi
+    "xxhdpi": 3.0, # 480dpi
+    "xxxhdpi": 4.0 # 640dpi
+}
+
+# 创建目录
+for density in density_ratios.keys():
+    dir_path = f"values-{density}"
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+# 生成dimens.xml文件
+for density, ratio in density_ratios.items():
+    file_path = f"values-{density}/dimens.xml"
+    with open(file_path, "w") as f:
+        f.write('<?xml version="1.0" encoding="utf-8"?>\n')
+        f.write('<resources>\n')
+
+        # 生成_font_10px到_font_100px的sp值
+        for font_px in range(10, 101, 1):  # 从10px到100px，步长为10
+            sp_value = font_px / ratio  # px转换为sp
+            f.write(f'    <dimen name="_font_{font_px}px">{sp_value:.4f}sp</dimen>\n')
+
+        # 生成1px到2000px的dp值
+        for px in range(1, 2001):  # 从1到2000
+            dp_value = px / ratio  # px转换为dp
+            f.write(f'    <dimen name="_{px}px">{dp_value:.4f}dp</dimen>\n')
+
+        f.write('</resources>\n')
+
+print("dimens.xml文件已生成！")

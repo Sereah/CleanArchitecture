@@ -1,5 +1,6 @@
 package com.lunacattus.clean.data.remote.datasource
 
+import com.lunacattus.clean.data.remote.model.GaoDeIpInfoDTO
 import com.lunacattus.clean.data.remote.model.GaoDeWeatherDTO
 import com.lunacattus.data.BuildConfig
 import retrofit2.http.GET
@@ -10,4 +11,7 @@ interface GaoDeWeatherApiService {
     suspend fun getLiveWeather(
         @Query("city") cityCode: String,
     ): GaoDeWeatherDTO
+
+    @GET("v3/ip?key=${BuildConfig.gaoDeApi}")
+    suspend fun getCurrentAdCodeByIp(): GaoDeIpInfoDTO
 }

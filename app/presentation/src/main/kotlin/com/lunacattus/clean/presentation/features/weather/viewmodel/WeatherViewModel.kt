@@ -2,7 +2,8 @@ package com.lunacattus.clean.presentation.features.weather.viewmodel
 
 import androidx.lifecycle.viewModelScope
 import com.lunacattus.clean.common.Logger
-import com.lunacattus.clean.domain.usecase.weather.GetLiveWeatherUseCase
+import com.lunacattus.clean.domain.model.weather.WeatherException
+import com.lunacattus.clean.domain.usecase.weather.GetCurrentLiveWeatherUseCase
 import com.lunacattus.clean.presentation.common.ui.base.BaseViewModel
 import com.lunacattus.clean.presentation.features.weather.mvi.WeatherSideEffect
 import com.lunacattus.clean.presentation.features.weather.mvi.WeatherUiIntent
@@ -13,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WeatherViewModel @Inject constructor(
-    private val getLiveWeatherUseCase: GetLiveWeatherUseCase
+    private val getCurrentLiveWeatherUseCase: GetCurrentLiveWeatherUseCase
 ) : BaseViewModel<WeatherUiIntent, WeatherUiState, WeatherSideEffect>() {
 
     init {
@@ -23,7 +24,7 @@ class WeatherViewModel @Inject constructor(
 
     override val initUiState: WeatherUiState get() = WeatherUiState()
 
-    override suspend fun processUiIntent(intent: WeatherUiIntent) {
+    override fun processUiIntent(intent: WeatherUiIntent) {
 
     }
 
@@ -33,12 +34,27 @@ class WeatherViewModel @Inject constructor(
 
     private fun getLiveWeather() {
         viewModelScope.launch {
-            val result = getLiveWeatherUseCase.invoke("500000")
+            val result = getCurrentLiveWeatherUseCase.invoke()
             result
-                .onSuccess {
-                    Logger.d(TAG, "getLiveWeather: $it")
-                }.onFailure {
-                    Logger.e(TAG, "$it")
+                .onSuccess { livesWeather ->
+                    Logger.d(TAG, "getLiveWeather: $livesWeather")
+                    updateUiState {
+                        it.copy(loading = false, weatherInfo = livesWeather)
+                    }
+                }.onFailure { error ->
+                    when (error) {
+                        is WeatherException.EmptyWeatherInfo -> {
+                            sendSideEffect(WeatherSideEffect.ShowGetWeatherInfoEmptyToast)
+                        }
+
+                        is WeatherException.EmptyAdCode -> {
+                            sendSideEffect(WeatherSideEffect.ShowAdCodeEmptyToast)
+                        }
+
+                        is WeatherException.FailNetworkRequest -> {
+                            sendSideEffect(WeatherSideEffect.ShowNetworkRequestFailToast)
+                        }
+                    }
                 }
         }
     }

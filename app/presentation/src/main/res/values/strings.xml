@@ -6,11 +6,15 @@
     <string name="update_time">Updated as of %s</string>
     <string name="weather_clear">Clear</string>
     <string name="temperature_24">24</string>
-    <string name="temperature_unit">°C</string>
+    <string name="temperature_unit">°</string>
     <string name="humidity">HUMIDITY</string>
     <string name="wind">WIND</string>
     <string name="feel">FEELS LIKE</string>
     <string name="humidity_value">%d%%</string>
     <string name="wind_value">%.2fkm/h</string>
     <string name="feel_value">%d°</string>
+    <string name="today">Today</string>
+    <string name="empty_ad_code_exception">定位异常，请切换网络重试</string>
+    <string name="empty_weather_exception">获取天气信息异常，请切换网络重试</string>
+    <string name="network_fail_exception">网络异常，请稍后重试</string>
 </resources>

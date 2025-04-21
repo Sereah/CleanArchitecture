@@ -6,8 +6,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GetLiveWeatherUseCase @Inject constructor(private val repository: IWeatherRepository) {
-    suspend operator fun invoke(cityCode: String): Result<LivesWeather> {
-        return repository.getLivesWeather(cityCode)
+class GetCurrentLiveWeatherUseCase @Inject constructor(private val repository: IWeatherRepository) {
+    suspend operator fun invoke(): Result<LivesWeather> {
+        return repository.getLivesWeather()
     }
 }

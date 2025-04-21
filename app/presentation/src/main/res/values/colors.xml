@@ -3,4 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="weather_next_week_bg">#99535353</color>
+    <color name="weather_sunny_bg">#F0ECC6</color>
+    <color name="weather_wind_bg">#C6EEF0</color>
+    <color name="weather_rain_bg">#2538CD</color>
 </resources>

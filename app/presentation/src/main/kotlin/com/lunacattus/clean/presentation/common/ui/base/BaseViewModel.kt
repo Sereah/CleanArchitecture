@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 abstract class BaseViewModel<INTENT : IUiIntent, STATE : IUiState, EFFECT : ISideEffect> :
     ViewModel() {
 
-    private val _uiState = MutableStateFlow<STATE>(initUiState)
+    private val _uiState = MutableStateFlow(initUiState)
     val uiState = _uiState.asStateFlow()
 
     private val _effect = Channel<EFFECT>(Channel.BUFFERED)
@@ -19,12 +19,18 @@ abstract class BaseViewModel<INTENT : IUiIntent, STATE : IUiState, EFFECT : ISid
 
     abstract val initUiState: STATE
 
-    abstract suspend fun processUiIntent(intent: INTENT)
+    abstract fun processUiIntent(intent: INTENT)
 
     fun handleUiIntent(intent: INTENT) {
         viewModelScope.launch {
             processUiIntent(intent)
         }
+    }
+
+    protected fun updateUiState(update: (STATE) -> STATE) {
+        val currentState = _uiState.value
+        val newState = update(currentState)
+        _uiState.value = newState
     }
 
     protected fun sendSideEffect(effect: EFFECT) {

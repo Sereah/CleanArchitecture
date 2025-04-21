@@ -18,7 +18,7 @@ class HomeViewModel @Inject constructor() :
 
     override val initUiState: HomeUiState get() = HomeUiState()
 
-    override suspend fun processUiIntent(intent: HomeUiIntent) {
+    override fun processUiIntent(intent: HomeUiIntent) {
         when (intent) {
             HomeUiIntent.OnFeatureChatRequested -> {
                 sendSideEffect(HomeSideEffect.NavigateToWeatherFeature)

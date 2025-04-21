@@ -15,6 +15,7 @@ import com.lunacattus.clean.presentation.common.navigation.NavCoordinator
 import com.lunacattus.clean.presentation.common.ui.dialog.DialogShareViewModel
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 
@@ -57,29 +58,18 @@ abstract class BaseFragment<
     protected abstract fun setupObservers()
     protected abstract fun handleSideEffect(effect: EFFECT)
 
-    protected fun <T> observeUiState(
-        selector: (STATE) -> T,
-        useDistinct: Boolean = true,
-        action: (T) -> Unit
-    ) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                val flow = viewModel.uiState
-                    .mapNotNull { selector(it) }
-                if (useDistinct) {
-                    flow.distinctUntilChanged()
-                }
-                flow.collect { value -> action(value) }
-            }
-        }
-    }
+    protected inner class UiStateObserver<T>(
+        val selector: (STATE) -> T,
+        val lifecycle: Lifecycle.State = Lifecycle.State.STARTED,
+        val useDistinct: Boolean = true,
+        val filterCondition: (T) -> Boolean = { true },
+        val action: (T) -> Unit
+    )
 
-    private fun observeSideEffect() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.sideEffect.collect { effect ->
-                    handleSideEffect(effect)
-                }
+    protected fun observeUiStates(vararg observers: UiStateObserver<*>) {
+        observers.forEach { observer ->
+            viewLifecycleOwner.lifecycleScope.launch {
+                observer.handleObservation()
             }
         }
     }
@@ -96,5 +86,27 @@ abstract class BaseFragment<
             NavCoordinatorEntryPoint::class.java
         )
         return entryPoint.navCoordinator()
+    }
+
+    private fun observeSideEffect() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.sideEffect.collect { effect ->
+                    handleSideEffect(effect)
+                }
+            }
+        }
+    }
+
+    private suspend fun <T> UiStateObserver<T>.handleObservation() {
+        viewLifecycleOwner.lifecycle.repeatOnLifecycle(lifecycle) {
+            var flow = viewModel.uiState
+                .mapNotNull { selector(it) }
+                .filter { filterCondition(it) }
+            if (useDistinct) {
+                flow = flow.distinctUntilChanged()
+            }
+            flow.collect { value -> action(value) }
+        }
     }
 }

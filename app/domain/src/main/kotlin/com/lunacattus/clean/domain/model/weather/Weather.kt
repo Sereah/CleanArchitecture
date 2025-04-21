@@ -10,3 +10,9 @@ data class LivesWeather(
     val humidity: Int = 0,
     val reportTime: String = ""
 )
+
+sealed class WeatherException: Exception() {
+    data object EmptyAdCode: WeatherException()
+    data object EmptyWeatherInfo: WeatherException()
+    data object FailNetworkRequest: WeatherException()
+}

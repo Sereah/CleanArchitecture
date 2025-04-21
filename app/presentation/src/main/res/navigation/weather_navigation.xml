@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/chat_navigation"
+    android:id="@+id/weather_navigation"
     app:startDestination="@id/weather_dest">
 
     <fragment
         android:id="@+id/weather_dest"
         android:name="com.lunacattus.clean.presentation.features.weather.ui.WeatherFragment"
-        android:label="ChatFragment" />
+        android:label="WeatherFragment" />
 </navigation>

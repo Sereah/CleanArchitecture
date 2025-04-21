@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.room)
+    alias(libs.plugins.secrets)
+    alias(libs.plugins.kotlin.parcelize)
 }
 
 android {
@@ -35,6 +37,9 @@ android {
     room {
         schemaDirectory("$projectDir/schema")
     }
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 dependencies {
@@ -49,6 +54,9 @@ dependencies {
     annotationProcessor(libs.androidx.room.compiler)
     ksp(libs.hilt.compiler)
     ksp(libs.androidx.room.compiler)
+    implementation(libs.retrofit2)
+    implementation(libs.retrofit2.converter.gson)
+    implementation(libs.okhttp)
 
     implementation(project(":app:domain"))
 }

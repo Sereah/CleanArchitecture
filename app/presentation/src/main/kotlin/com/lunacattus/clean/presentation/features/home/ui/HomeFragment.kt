@@ -40,7 +40,7 @@ class HomeFragment :
                 getNavCoordinator().execute(
                     NavCommand.ToDirection(
                         object : NavDirections {
-                            override val actionId: Int = R.id.action_home_to_chat
+                            override val actionId: Int = R.id.action_home_to_weather
                             override val arguments: Bundle = Bundle()
                         }
                     ))

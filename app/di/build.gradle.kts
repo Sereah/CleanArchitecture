@@ -6,13 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.lunacattus.clean.domain"
+    namespace = "com.lunacattus.di"
     compileSdk = 35
 
     defaultConfig {
         minSdk = 29
-
-        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -36,11 +34,6 @@ android {
 dependencies {
 
     implementation(libs.androidx.core.ktx)
-    testImplementation(libs.junit)
-
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
-
-    api(project(":Logger"))
-    api(project(":app:di"))
 }

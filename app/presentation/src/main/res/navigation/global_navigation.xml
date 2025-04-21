@@ -12,16 +12,11 @@
         tools:layout="@layout/fragment_home">
 
         <action
-            android:id="@+id/action_home_to_resume"
-            app:destination="@id/resume_navigation" />
-
-        <action
-            android:id="@+id/action_home_to_chat"
-            app:destination="@+id/chat_navigation" />
+            android:id="@+id/action_home_to_weather"
+            app:destination="@id/weather_navigation" />
 
     </fragment>
 
-    <include app:graph="@navigation/resume_navigation" />
     <include app:graph="@navigation/weather_navigation" />
 
     <dialog

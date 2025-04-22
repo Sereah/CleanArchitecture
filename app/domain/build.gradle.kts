@@ -42,5 +42,5 @@ dependencies {
     ksp(libs.hilt.compiler)
 
     api(project(":Logger"))
-    api(project(":app:di"))
+    api(project(":common"))
 }

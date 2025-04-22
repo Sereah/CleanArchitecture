@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".features.weather.ui.WeatherFragment">
+    tools:context="com.lunacattus.app.presentation.features.weather.ui.WeatherFragment">
 
     <TextView
         android:id="@+id/title"
@@ -46,6 +46,17 @@
         android:textSize="200sp"
         app:layout_constraintStart_toEndOf="@+id/temp"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/report_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:fontFamily="sans-serif-light"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toTopOf="@+id/ic_location"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageView
         android:id="@+id/ic_location"

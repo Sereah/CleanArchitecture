@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".features.home.ui.HomeFragment">
+    tools:context="com.lunacattus.app.presentation.features.home.ui.HomeFragment">
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_feature_chat"

@@ -33,6 +33,7 @@ object GaoDeWeatherMapper {
                 val condition = mapperCondition(cast.dayCondition, cast.nightCondition)
                 DailyForecast(
                     date = cast.date.parseToTimestamp() ?: -1L,
+                    week = cast.week,
                     minTemp = minTemp,
                     maxTemp = maxTemp,
                     condition = condition

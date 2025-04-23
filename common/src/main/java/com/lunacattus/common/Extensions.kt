@@ -1,5 +1,6 @@
 package com.lunacattus.common
 
+import android.content.Context
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -7,6 +8,7 @@ import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import kotlin.math.roundToInt
 
 /**
 * 将日期时间字符串解析为时间戳（Long）
@@ -61,3 +63,29 @@ fun Long.toFormattedDateTime(format: String = "yyyy-MM-dd HH:mm:ss"): String {
         .atZone(ZoneId.systemDefault())
         .format(formatter)
 }
+
+/**
+ * 根据时间戳判断是否是今天
+ */
+fun Long.isToday(): Boolean {
+    val givenDate = Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalDate()
+    val currentDate = LocalDate.now()
+    return givenDate == currentDate
+}
+
+/**
+ * 将阿拉伯数字转换为汉字
+ */
+fun Int.toChineseOrEmpty(): String {
+    val chineseNumbers = arrayOf("零", "一", "二", "三", "四", "五", "六", "七", "八", "九")
+    return when {
+        this in 0..9 -> chineseNumbers[this]
+        else -> ""
+    }
+}
+
+/**
+ * 将dp转化为px
+ */
+fun Int.dpToPx(context: Context): Int =
+    (this * context.resources.displayMetrics.density).roundToInt()

@@ -6,23 +6,17 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.lunacattus.app.data.local.entity.ResumeEntity
+import com.lunacattus.app.data.local.entity.LiveWeatherEntity
+import com.lunacattus.app.data.local.entity.WeatherEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ResumeDao {
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(resumeEntity: ResumeEntity)
+    suspend fun insertWeather(resumeEntity: WeatherEntity)
 
-    @Query("SELECT * FROM resume")
-    fun allResumeFlow(): Flow<List<ResumeEntity>>
+    @Query("SELECT * FROM weather")
+    fun allResumeFlow(): Flow<List<WeatherEntity>>
 
-    @Delete
-    suspend fun deleteResume(resumeEntity: ResumeEntity)
-
-    @Update
-    suspend fun updateResume(resumeEntity: ResumeEntity)
-
-    @Query("SELECT * FROM resume WHERE id = :id")
-    suspend fun getResumeById(id: String): ResumeEntity
 }

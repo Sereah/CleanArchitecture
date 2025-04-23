@@ -2,63 +2,75 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "f3a00c259033c3803f929afe3cf08501",
+    "identityHash": "dd21aa7151904732dfda41226f4546bb",
     "entities": [
       {
-        "tableName": "resume",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `age` INTEGER NOT NULL, `email` TEXT NOT NULL, `phone` TEXT NOT NULL, `educationList` TEXT NOT NULL, `workExperienceList` TEXT NOT NULL, `skillList` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "tableName": "weather",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `provence` TEXT NOT NULL, `city` TEXT NOT NULL, `condition` TEXT NOT NULL, `temperature` REAL NOT NULL, `windDirection` TEXT NOT NULL, `windPower` TEXT NOT NULL, `humidity` INTEGER NOT NULL, `reportTime` INTEGER NOT NULL, `dailyWeather` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "name",
-            "columnName": "name",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "age",
-            "columnName": "age",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
-            "fieldPath": "email",
-            "columnName": "email",
+            "fieldPath": "provence",
+            "columnName": "provence",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "phone",
-            "columnName": "phone",
+            "fieldPath": "city",
+            "columnName": "city",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "educationList",
-            "columnName": "educationList",
+            "fieldPath": "condition",
+            "columnName": "condition",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "workExperienceList",
-            "columnName": "workExperienceList",
+            "fieldPath": "temperature",
+            "columnName": "temperature",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "windDirection",
+            "columnName": "windDirection",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "skillList",
-            "columnName": "skillList",
+            "fieldPath": "windPower",
+            "columnName": "windPower",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "humidity",
+            "columnName": "humidity",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reportTime",
+            "columnName": "reportTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dailyWeather",
+            "columnName": "dailyWeather",
             "affinity": "TEXT",
             "notNull": true
           }
         ],
         "primaryKey": {
-          "autoGenerate": false,
+          "autoGenerate": true,
           "columnNames": [
             "id"
           ]
@@ -67,7 +79,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f3a00c259033c3803f929afe3cf08501')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dd21aa7151904732dfda41226f4546bb')"
     ]
   }
 }

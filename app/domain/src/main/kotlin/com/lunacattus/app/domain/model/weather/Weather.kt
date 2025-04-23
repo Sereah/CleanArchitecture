@@ -14,6 +14,7 @@ data class WeatherInfo(
 
 data class DailyForecast(
     val date: Long,
+    val week: Int,
     val minTemp: Float,
     val maxTemp: Float,
     val condition: WeatherCondition

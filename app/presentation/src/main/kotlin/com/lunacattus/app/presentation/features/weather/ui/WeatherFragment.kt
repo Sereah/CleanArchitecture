@@ -3,10 +3,13 @@ package com.lunacattus.app.presentation.features.weather.ui
 import android.os.Bundle
 import android.widget.Toast
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.github.promeg.pinyinhelper.Pinyin
 import com.github.promeg.tinypinyin.lexicons.android.cncity.CnCityDict
 import com.lunacattus.app.domain.model.weather.WeatherCondition
 import com.lunacattus.app.domain.model.weather.WeatherInfo
+import com.lunacattus.app.presentation.common.ui.UniformItemDecoration
 import com.lunacattus.app.presentation.common.ui.base.BaseFragment
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherSideEffect
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiIntent
@@ -15,6 +18,7 @@ import com.lunacattus.app.presentation.features.weather.viewmodel.WeatherViewMod
 import com.lunacattus.clean.common.Logger
 import com.lunacattus.clean.presentation.R
 import com.lunacattus.clean.presentation.databinding.FragmentWeatherBinding
+import com.lunacattus.common.dpToPx
 import com.lunacattus.common.toFormattedDateTime
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -24,10 +28,28 @@ class WeatherFragment :
         FragmentWeatherBinding::inflate
     ) {
 
+    private lateinit var adapter: DailyWeatherListAdapter
+
     override val viewModel: WeatherViewModel by hiltNavGraphViewModels(R.id.weather_navigation)
 
     override fun setupViews(savedInstanceState: Bundle?) {
         Pinyin.init(Pinyin.newConfig().with(CnCityDict.getInstance(requireContext())))
+        adapter = DailyWeatherListAdapter(requireContext()).apply {
+            binding.dailyList.adapter = this
+        }
+        binding.dailyList.apply {
+            layoutManager = LinearLayoutManager(requireContext()).apply {
+                orientation = RecyclerView.HORIZONTAL
+            }
+            addItemDecoration(
+                UniformItemDecoration(
+                    false,
+                    6,
+                    20.dpToPx(context),
+                    itemWidth = 40.dpToPx(context)
+                )
+            )
+        }
     }
 
     override fun setupObservers() {
@@ -62,6 +84,7 @@ class WeatherFragment :
         val cityArr = Pinyin.toPinyin(weather.city, ",").split(",")
         binding.cityEn.text = splitCityPinyin(cityArr)
         bindWeatherImg(weather.condition)
+        adapter.submitList(weather.dailyForecast)
     }
 
     private fun splitCityPinyin(parts: List<String>): String {
@@ -88,6 +111,7 @@ class WeatherFragment :
             WeatherCondition.SUNNY -> {
                 binding.tempImg.setImageResource(R.drawable.img_sunny)
                 binding.root.setBackgroundResource(R.color.weather_sunny_bg)
+                binding.imgLine.setImageResource(R.drawable.img_line_sunny)
                 bindBlackUI()
             }
 
@@ -95,12 +119,14 @@ class WeatherFragment :
             WeatherCondition.THUNDERSTORM -> {
                 binding.tempImg.setImageResource(R.drawable.img_rain)
                 binding.root.setBackgroundResource(R.color.weather_rain_bg)
+                binding.imgLine.setImageResource(R.drawable.img_line_rain)
                 bindWhiteUI()
             }
 
             else -> {
-                binding.tempImg.setImageResource(R.drawable.img_wind)
+                binding.tempImg.setImageResource(R.drawable.img_cloudy)
                 binding.root.setBackgroundResource(R.color.weather_wind_bg)
+                binding.imgLine.setImageResource(R.drawable.img_line_cloudy)
                 bindBlackUI()
             }
         }

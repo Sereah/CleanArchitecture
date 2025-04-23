@@ -3,10 +3,10 @@ package com.lunacattus.app.data.local
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.lunacattus.app.data.local.dao.ResumeDao
-import com.lunacattus.app.data.local.entity.ResumeEntity
+import com.lunacattus.app.data.local.entity.WeatherEntity
 
 @Database(
-    entities = [ResumeEntity::class],
+    entities = [WeatherEntity::class],
     version = 1,
     exportSchema = true
 )

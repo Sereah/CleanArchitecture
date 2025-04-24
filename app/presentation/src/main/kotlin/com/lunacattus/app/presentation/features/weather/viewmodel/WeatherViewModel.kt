@@ -24,18 +24,6 @@ class WeatherViewModel @Inject constructor(
     init {
         Logger.d(TAG, "init.")
         getWeather()
-        searchCity()
-    }
-
-    private fun searchCity() {
-        viewModelScope.launch {
-            val result = searchCityUseCase.invoke("重庆")
-            result.onSuccess {
-                Logger.d(TAG, "-----$it")
-            }.onFailure {
-                Logger.e(TAG, "-----$it")
-            }
-        }
     }
 
     override val initUiState: WeatherUiState get() = WeatherUiState()
@@ -46,14 +34,32 @@ class WeatherViewModel @Inject constructor(
                 requestWeatherInfo()
             }
 
-            WeatherUiIntent.OnCityOptionsRequested -> {
-                sendSideEffect(WeatherSideEffect.NavigateToCityOption)
+            is WeatherUiIntent.OnSearchCityRequested -> {
+                searchCity(intent.keyword)
             }
         }
     }
 
     override fun onCleared() {
         Logger.d(TAG, "onCleared.")
+    }
+
+    private fun searchCity(keyword: String) {
+        Logger.d(TAG, "searchCity: $keyword")
+        if (keyword.isEmpty()) return
+        viewModelScope.launch {
+            val result = searchCityUseCase.invoke(keyword)
+            result.onSuccess { result ->
+                updateUiState {
+                    it.copy(searchResult = result)
+                }
+            }.onFailure { error ->
+                Logger.e(TAG, "searchCity: $error")
+                sendSideEffect(
+                    WeatherSideEffect.ShowNetworkRequestFailToast(msg = error.toString())
+                )
+            }
+        }
     }
 
     private fun requestWeatherInfo() {

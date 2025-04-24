@@ -1,6 +1,13 @@
 package com.lunacattus.common
 
 import android.content.Context
+import android.text.Editable
+import android.text.TextWatcher
+import android.widget.EditText
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -11,12 +18,12 @@ import java.time.format.DateTimeParseException
 import kotlin.math.roundToInt
 
 /**
-* 将日期时间字符串解析为时间戳（Long）
-* 支持格式：
-* 1. yyyy-MM-dd HH:mm:ss → 转为 LocalDateTime 的时间戳
-* 2. yyyy-MM-dd → 转为 LocalDate 的时间戳（默认时间设为 00:00:00）
-* 3. HH:mm:ss → 转为当天的时间戳（日期为当前日期）
-*/
+ * 将日期时间字符串解析为时间戳（Long）
+ * 支持格式：
+ * 1. yyyy-MM-dd HH:mm:ss → 转为 LocalDateTime 的时间戳
+ * 2. yyyy-MM-dd → 转为 LocalDate 的时间戳（默认时间设为 00:00:00）
+ * 3. HH:mm:ss → 转为当天的时间戳（日期为当前日期）
+ */
 fun String.parseToTimestamp(): Long? {
     return try {
         when {
@@ -45,18 +52,18 @@ fun String.parseToTimestamp(): Long? {
                     .toInstant()
                     .toEpochMilli()
             }
+
             else -> null // 格式不匹配
         }
-    } catch (e: DateTimeParseException) {
+    } catch (_: DateTimeParseException) {
         null // 解析失败
     }
 }
 
 /**
-* 将时间戳（Long）转换为指定格式的日期时间字符串
-* @param timestamp 时间戳（毫秒）
-* @param format 目标格式（默认 "yyyy-MM-dd HH:mm:ss"）
-*/
+ * 将时间戳（Long）转换为指定格式的日期时间字符串
+ * @param format 目标格式（默认 "yyyy-MM-dd HH:mm:ss"）
+ */
 fun Long.toFormattedDateTime(format: String = "yyyy-MM-dd HH:mm:ss"): String {
     val formatter = DateTimeFormatter.ofPattern(format)
     return Instant.ofEpochMilli(this)
@@ -89,3 +96,39 @@ fun Int.toChineseOrEmpty(): String {
  */
 fun Int.dpToPx(context: Context): Int =
     (this * context.resources.displayMetrics.density).roundToInt()
+
+/**
+ * 输入框输入完文字后的防抖策略
+ */
+fun EditText.debounce(
+    delayMillis: Long,
+    coroutineScope: CoroutineScope,
+    afterTextChanged: (String) -> Unit
+) {
+    var debounceJob: Job? = null
+    this.addTextChangedListener(object : TextWatcher {
+        override fun beforeTextChanged(
+            s: CharSequence?,
+            start: Int,
+            count: Int,
+            after: Int
+        ) {
+        }
+
+        override fun onTextChanged(
+            s: CharSequence?,
+            start: Int,
+            before: Int,
+            count: Int
+        ) {
+        }
+
+        override fun afterTextChanged(s: Editable?) {
+            debounceJob?.cancel()
+            debounceJob = coroutineScope.launch {
+                delay(delayMillis)
+                afterTextChanged(s.toString())
+            }
+        }
+    })
+}

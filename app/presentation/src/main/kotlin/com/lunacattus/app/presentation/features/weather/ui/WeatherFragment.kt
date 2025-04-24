@@ -58,7 +58,14 @@ class WeatherFragment :
             )
         }
         binding.option.setOnClickListener {
-            dispatchUiIntent(WeatherUiIntent.OnCityOptionsRequested)
+            navCoordinator().execute(
+                NavCommand.ToDirection(
+                    object : NavDirections {
+                        override val actionId: Int = R.id.action_weather_to_city_option
+                        override val arguments: Bundle = Bundle()
+                    }
+                )
+            )
         }
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -95,18 +102,27 @@ class WeatherFragment :
                 )
                 Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
             }
-
-            WeatherSideEffect.NavigateToCityOption -> {
-                navCoordinator().execute(
-                    NavCommand.ToDirection(
-                        object : NavDirections {
-                            override val actionId: Int = R.id.action_weather_to_city_option
-                            override val arguments: Bundle = Bundle()
-                        }
-                    )
-                )
-            }
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Logger.d(TAG, "onStop")
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Logger.d(TAG, "onStart")
+    }
+
+    override fun onDestroyView() {
+        Logger.d(TAG, "onDestroyView")
+        super.onDestroyView()
+    }
+
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        Logger.d(TAG, "onHiddenChanged: $hidden")
     }
 
     private fun bindWeatherInfo(weather: WeatherInfo) {

@@ -50,6 +50,7 @@ class WeatherRepository @Inject constructor(
         withContext(Dispatchers.IO) {
             try {
                 val response = gaoDeWeatherDataSource.searchCity(keyword)
+                Logger.d(TAG, "searchCity response: $response")
                 if (response.status == 0) {
                     throw WeatherException.ApiError(response.infoCode, response.info)
                 }

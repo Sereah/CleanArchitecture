@@ -20,5 +20,11 @@
     <string name="weather_fail_exception">网络请求异常: %s %s</string>
     <string name="week">周%s</string>
     <string name="temp_min_to_max">%d-%d°</string>
+    <string name="name_to_pName">%s-%s</string>
     <string name="update">%s 更新</string>
+    <string name="city_option">城市管理</string>
+    <string name="search_hint">搜索位置</string>
+    <string name="current_location">当前定位</string>
+    <string name="added_city">已添加城市</string>
+    <string name="cancel">取消</string>
 </resources>

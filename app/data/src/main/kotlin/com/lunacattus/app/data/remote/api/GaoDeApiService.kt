@@ -23,7 +23,7 @@ interface GaoDeApiService {
     @GET("v3/ip?key=${BuildConfig.gaoDeApi}")
     suspend fun getCurrentAdCodeByIp(): GaoDeIpInfoDTO
 
-    @GET("v3/place/text?key=${BuildConfig.gaoDeApi}&types=190100&children=1&offset=5&page=1&extensions=all")
+    @GET("v3/place/text?key=${BuildConfig.gaoDeApi}&types=190100&children=1&offset=20&page=1&extensions=all")
     suspend fun searchCityAdCode(
         @Query("keywords")keywords: String
     ): GaoDeSearchCityDTO

@@ -80,7 +80,7 @@ abstract class BaseFragment<
 
     protected fun dialogResultState() = dialogViewModel.resultState
 
-    protected fun getNavCoordinator(): NavCoordinator {
+    protected fun navCoordinator(): NavCoordinator {
         val entryPoint = EntryPointAccessors.fromActivity(
             requireActivity(),
             NavCoordinatorEntryPoint::class.java

@@ -3,7 +3,7 @@ package com.lunacattus.app.data.di
 import android.content.Context
 import androidx.room.Room
 import com.lunacattus.app.data.local.Database
-import com.lunacattus.app.data.local.dao.ResumeDao
+import com.lunacattus.app.data.local.api.WeatherDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,7 +25,7 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideResumeDao(database: Database): ResumeDao {
-        return database.resumeDao()
+    fun provideResumeDao(database: Database): WeatherDao {
+        return database.weatherDao()
     }
 }

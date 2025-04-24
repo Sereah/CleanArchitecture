@@ -3,12 +3,17 @@ package com.lunacattus.app.presentation.features.weather.ui
 import android.os.Bundle
 import android.widget.Toast
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavDirections
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.promeg.pinyinhelper.Pinyin
 import com.github.promeg.tinypinyin.lexicons.android.cncity.CnCityDict
 import com.lunacattus.app.domain.model.weather.WeatherCondition
 import com.lunacattus.app.domain.model.weather.WeatherInfo
+import com.lunacattus.app.presentation.common.navigation.NavCommand
 import com.lunacattus.app.presentation.common.ui.UniformItemDecoration
 import com.lunacattus.app.presentation.common.ui.base.BaseFragment
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherSideEffect
@@ -21,6 +26,8 @@ import com.lunacattus.clean.presentation.databinding.FragmentWeatherBinding
 import com.lunacattus.common.dpToPx
 import com.lunacattus.common.toFormattedDateTime
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class WeatherFragment :
@@ -50,13 +57,24 @@ class WeatherFragment :
                 )
             )
         }
+        binding.option.setOnClickListener {
+            dispatchUiIntent(WeatherUiIntent.OnCityOptionsRequested)
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                while (true) {
+                    dispatchUiIntent(WeatherUiIntent.OnNetworkWeatherInfoRequested)
+                    delay(300000) //5min请求一次网络
+                }
+            }
+        }
     }
 
     override fun setupObservers() {
         observeUiStates(
             UiStateObserver(
                 selector = { it.weatherInfo },
-                filterCondition = { it != null }
+                filterCondition = { it != null && it.dailyForecast.isNotEmpty() }
             ) { weather ->
                 Logger.d(TAG, "collect weatherInfo: $weather")
                 weather?.let { bindWeatherInfo(it) }
@@ -68,11 +86,27 @@ class WeatherFragment :
     }
 
     override fun handleSideEffect(effect: WeatherSideEffect) {
-        val msg = when (effect) {
-            is WeatherSideEffect.ShowNetworkRequestFailToast ->
-                getString(R.string.weather_fail_exception, effect.code, effect.msg)
+        when (effect) {
+            is WeatherSideEffect.ShowNetworkRequestFailToast -> {
+                val msg = getString(
+                    R.string.weather_fail_exception,
+                    effect.code ?: "",
+                    effect.msg
+                )
+                Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
+            }
+
+            WeatherSideEffect.NavigateToCityOption -> {
+                navCoordinator().execute(
+                    NavCommand.ToDirection(
+                        object : NavDirections {
+                            override val actionId: Int = R.id.action_weather_to_city_option
+                            override val arguments: Bundle = Bundle()
+                        }
+                    )
+                )
+            }
         }
-        Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
     }
 
     private fun bindWeatherInfo(weather: WeatherInfo) {
@@ -80,7 +114,7 @@ class WeatherFragment :
         binding.temp.text = weather.temperature.toInt().toString()
         binding.tempUnit.text = getString(R.string.temperature_unit)
         binding.cityChn.text = weather.city
-        binding.reportTime.text = weather.reportTime.toFormattedDateTime()
+        binding.reportTime.text = weather.updateTime.toFormattedDateTime()
         val cityArr = Pinyin.toPinyin(weather.city, ",").split(",")
         binding.cityEn.text = splitCityPinyin(cityArr)
         bindWeatherImg(weather.condition)
@@ -133,6 +167,7 @@ class WeatherFragment :
     }
 
     private fun bindBlackUI() {
+        binding.option.setImageResource(R.drawable.ic_option_black)
         binding.title.setTextColor(requireContext().getColor(R.color.black))
         binding.temp.setTextColor(requireContext().getColor(R.color.black))
         binding.tempUnit.setTextColor(requireContext().getColor(R.color.black))
@@ -142,9 +177,11 @@ class WeatherFragment :
         binding.cityChn.setTextColor(requireContext().getColor(R.color.black))
         binding.preBtn.setImageResource(R.drawable.ic_pre_black)
         binding.nextBtn.setImageResource(R.drawable.ic_next_black)
+        adapter.notifyTextColor(true)
     }
 
     private fun bindWhiteUI() {
+        binding.option.setImageResource(R.drawable.ic_option_white)
         binding.title.setTextColor(requireContext().getColor(R.color.white))
         binding.temp.setTextColor(requireContext().getColor(R.color.white))
         binding.tempUnit.setTextColor(requireContext().getColor(R.color.white))
@@ -154,6 +191,7 @@ class WeatherFragment :
         binding.cityChn.setTextColor(requireContext().getColor(R.color.white))
         binding.preBtn.setImageResource(R.drawable.ic_pre_white)
         binding.nextBtn.setImageResource(R.drawable.ic_next_white)
+        adapter.notifyTextColor(false)
     }
 
     companion object {

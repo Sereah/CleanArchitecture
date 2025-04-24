@@ -17,7 +17,8 @@
     <string name="empty_ad_code_exception">定位异常，请切换网络重试</string>
     <string name="empty_weather_exception">获取天气信息异常，请切换网络重试</string>
     <string name="network_fail_exception">网络异常，请稍后重试</string>
-    <string name="weather_fail_exception">请求异常: %d %s</string>
+    <string name="weather_fail_exception">网络请求异常: %s %s</string>
     <string name="week">周%s</string>
     <string name="temp_min_to_max">%d-%d°</string>
+    <string name="update">%s 更新</string>
 </resources>

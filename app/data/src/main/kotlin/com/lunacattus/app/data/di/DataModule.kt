@@ -1,6 +1,6 @@
 package com.lunacattus.app.data.di
 
-import com.lunacattus.app.data.remote.datasource.GaoDeWeatherApiService
+import com.lunacattus.app.data.remote.api.GaoDeApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,11 +15,11 @@ object DataModule {
 
     @Provides
     @Singleton
-    fun provideGaoDeWeatherServiceApi(): GaoDeWeatherApiService {
+    fun provideGaoDeWeatherServiceApi(): GaoDeApiService {
         return Retrofit.Builder()
             .baseUrl("https://restapi.amap.com/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(GaoDeWeatherApiService::class.java)
+            .create(GaoDeApiService::class.java)
     }
 }

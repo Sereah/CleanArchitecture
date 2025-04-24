@@ -2,15 +2,15 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "dd21aa7151904732dfda41226f4546bb",
+    "identityHash": "b607e9e11283597adfdb72424fa4240b",
     "entities": [
       {
-        "tableName": "weather",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `provence` TEXT NOT NULL, `city` TEXT NOT NULL, `condition` TEXT NOT NULL, `temperature` REAL NOT NULL, `windDirection` TEXT NOT NULL, `windPower` TEXT NOT NULL, `humidity` INTEGER NOT NULL, `reportTime` INTEGER NOT NULL, `dailyWeather` TEXT NOT NULL)",
+        "tableName": "live_weather",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`adCode` INTEGER NOT NULL, `provence` TEXT NOT NULL, `city` TEXT NOT NULL, `condition` TEXT NOT NULL, `temperature` REAL NOT NULL, `windDirection` TEXT NOT NULL, `windPower` TEXT NOT NULL, `humidity` INTEGER NOT NULL, `reportTime` TEXT NOT NULL, `updateTime` INTEGER NOT NULL, PRIMARY KEY(`adCode`))",
         "fields": [
           {
-            "fieldPath": "id",
-            "columnName": "id",
+            "fieldPath": "adCode",
+            "columnName": "adCode",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -59,13 +59,109 @@
           {
             "fieldPath": "reportTime",
             "columnName": "reportTime",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updateTime",
+            "columnName": "updateTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "adCode"
+          ]
+        }
+      },
+      {
+        "tableName": "daily_weather",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `adCode` INTEGER NOT NULL, `date` TEXT NOT NULL, `week` INTEGER NOT NULL, `dayCondition` TEXT NOT NULL, `nightCondition` TEXT NOT NULL, `dayTemp` REAL NOT NULL, `nightTemp` REAL NOT NULL, `dayWindDirection` TEXT NOT NULL, `nightWindDirection` TEXT NOT NULL, `dayWindPower` TEXT NOT NULL, `nightWindPower` TEXT NOT NULL, `reportTime` TEXT NOT NULL, `updateTime` INTEGER NOT NULL, FOREIGN KEY(`adCode`) REFERENCES `live_weather`(`adCode`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
-            "fieldPath": "dailyWeather",
-            "columnName": "dailyWeather",
+            "fieldPath": "adCode",
+            "columnName": "adCode",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "date",
+            "columnName": "date",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "week",
+            "columnName": "week",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dayCondition",
+            "columnName": "dayCondition",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nightCondition",
+            "columnName": "nightCondition",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dayTemp",
+            "columnName": "dayTemp",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nightTemp",
+            "columnName": "nightTemp",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dayWindDirection",
+            "columnName": "dayWindDirection",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nightWindDirection",
+            "columnName": "nightWindDirection",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dayWindPower",
+            "columnName": "dayWindPower",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nightWindPower",
+            "columnName": "nightWindPower",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reportTime",
+            "columnName": "reportTime",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updateTime",
+            "columnName": "updateTime",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -74,12 +170,25 @@
           "columnNames": [
             "id"
           ]
-        }
+        },
+        "foreignKeys": [
+          {
+            "table": "live_weather",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "adCode"
+            ],
+            "referencedColumns": [
+              "adCode"
+            ]
+          }
+        ]
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dd21aa7151904732dfda41226f4546bb')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b607e9e11283597adfdb72424fa4240b')"
     ]
   }
 }

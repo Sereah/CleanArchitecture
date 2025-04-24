@@ -1,68 +1,104 @@
 package com.lunacattus.app.data.repository.weather
 
-import com.lunacattus.app.data.mapper.GaoDeWeatherMapper.mapper
+import com.lunacattus.app.data.local.datasource.WeatherLocalDataSource
+import com.lunacattus.app.data.mapper.WeatherMapper.mapperToEntity
+import com.lunacattus.app.data.mapper.WeatherMapper.mapperToModel
 import com.lunacattus.app.data.remote.datasource.GaoDeWeatherRemoteDataSource
+import com.lunacattus.app.data.remote.dto.GaoDeDailyWeatherDTO
+import com.lunacattus.app.data.remote.dto.GaoDeLiveWeatherDTO
+import com.lunacattus.app.domain.model.weather.CityInfo
 import com.lunacattus.app.domain.model.weather.WeatherException
 import com.lunacattus.app.domain.model.weather.WeatherInfo
 import com.lunacattus.app.domain.repository.weather.IWeatherRepository
 import com.lunacattus.clean.common.Logger
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class WeatherRepository @Inject constructor(
-    private val gaoDeWeatherDataSource: GaoDeWeatherRemoteDataSource
+    private val gaoDeWeatherDataSource: GaoDeWeatherRemoteDataSource,
+    private val weatherLocalDataSource: WeatherLocalDataSource
 ) : IWeatherRepository {
 
-    override suspend fun getWeather(cityCode: String): Result<WeatherInfo> {
-        return withContext(Dispatchers.IO) {
-            try {
-                val liveResponse = gaoDeWeatherDataSource.getLiveWeather(cityCode)
-                val dailyResponse = gaoDeWeatherDataSource.getDailyWeather(cityCode)
-                Logger.d(TAG, "getLiveWeather, response: $liveResponse")
-                Logger.d(TAG, "getDailyWeather, response: $dailyResponse")
-                if (liveResponse.status == 0) {
-                    throw WeatherException.ApiError(
-                        code = liveResponse.infoCode,
-                        msg = liveResponse.info
-                    )
-                }
-                if (dailyResponse.status == 0) {
-                    throw WeatherException.ApiError(
-                        code = dailyResponse.infoCode,
-                        msg = dailyResponse.info
-                    )
-                }
-                if (liveResponse.lives.isEmpty()) {
-                    throw WeatherException.OtherError("Weather info empty")
-                }
-                Result.success(mapper(liveResponse, dailyResponse))
-            } catch (e: Throwable) {
-                Result.failure(e)
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
+    override fun getWeather(): Result<Flow<WeatherInfo?>> {
+        return try {
+            val result = weatherLocalDataSource.getWeatherWithDailyWeather()
+            Logger.d(TAG, "getWeather: $result")
+            Result.success(result.map { it?.mapperToModel() })
+        } catch (e: Throwable) {
+            Result.failure(e)
         }
     }
 
-    override suspend fun getWeather(): Result<WeatherInfo> {
-        return withContext(Dispatchers.IO) {
-            val response = gaoDeWeatherDataSource.getCurrentAdCode()
-            Logger.d(TAG, "getCurrentAdCode, response: $response")
-            when {
-                response.status == 0 -> {
-                    Result.failure(WeatherException.ApiError(response.infoCode, response.info))
-                }
+    override suspend fun requestCurrentWeatherInfo(): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val adCode = getCurrentAdCode()
+            saveWeatherInfo(adCode)
+            Result.success(Unit)
+        } catch (e: Throwable) {
+            Result.failure(e)
+        }
+    }
 
-                response.adCode !is String -> {
-                    Result.failure(WeatherException.OtherError("AdCode info empty"))
+    override suspend fun searchCity(keyword: String): Result<List<CityInfo>> =
+        withContext(Dispatchers.IO) {
+            try {
+                val response = gaoDeWeatherDataSource.searchCity(keyword)
+                if (response.status == 0) {
+                    throw WeatherException.ApiError(response.infoCode, response.info)
                 }
-
-                else -> getWeather(response.adCode)
+                Result.success(response.mapperToModel())
+            } catch (e: Throwable) {
+                Result.failure(e)
             }
         }
+
+    private suspend fun getCurrentAdCode(): String {
+        val response = gaoDeWeatherDataSource.getCurrentAdCode()
+        Logger.d(TAG, "getCurrentAdCode, response: $response")
+        if (response.status == 0) throw WeatherException.ApiError(response.infoCode, response.info)
+        if (response.adCode !is String) throw WeatherException.OtherError("AdCode info empty")
+        return response.adCode
+    }
+
+    private suspend fun saveWeatherInfo(adCode: String) = coroutineScope {
+        val liveDeferred = async {
+            val liveResponse = gaoDeWeatherDataSource.getLiveWeather(adCode)
+            Logger.d(TAG, "getLiveWeather, response: $liveResponse")
+            validateAndSaveLiveWeather(liveResponse, adCode)
+        }
+
+        val dailyDeferred = async {
+            val dailyResponse = gaoDeWeatherDataSource.getDailyWeather(adCode)
+            Logger.d(TAG, "getDailyWeather, response: $dailyResponse")
+            validateAndSaveDailyWeather(dailyResponse, adCode)
+        }
+        liveDeferred.await()
+        dailyDeferred.await()
+    }
+
+    private suspend fun validateAndSaveLiveWeather(response: GaoDeLiveWeatherDTO, adCode: String) {
+        if (response.status == 0) throw WeatherException.ApiError(response.infoCode, response.info)
+        if (response.lives.isEmpty()) throw WeatherException.OtherError("Weather info empty")
+
+        val result = weatherLocalDataSource.insertLiveWeather(response.mapperToEntity())
+        if (result != adCode.toLong()) throw WeatherException.OtherError("Insert Live Weather fail.")
+    }
+
+    private suspend fun validateAndSaveDailyWeather(
+        response: GaoDeDailyWeatherDTO,
+        adCode: String
+    ) {
+        if (response.status == 0) throw WeatherException.ApiError(response.infoCode, response.info)
+
+        val result = weatherLocalDataSource.insertDailyWeather(adCode, response.mapperToEntity())
+        if (result.isEmpty()) throw WeatherException.OtherError("Insert Daily Weather fail.")
     }
 
     companion object {

@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/weather_navigation"
     app:startDestination="@id/weather_dest">
 
     <fragment
         android:id="@+id/weather_dest"
         android:name="com.lunacattus.app.presentation.features.weather.ui.WeatherFragment"
-        android:label="WeatherFragment" />
+        android:label="WeatherFragment" >
+        <action
+            android:id="@+id/action_weather_to_city_option"
+            app:destination="@id/city_dest" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/city_dest"
+        android:name="com.lunacattus.app.presentation.features.weather.ui.CityOptionFragment"
+        android:label="fragment_city_option"
+        tools:layout="@layout/fragment_city_option" />
 </navigation>

@@ -1,8 +1,11 @@
 package com.lunacattus.app.domain.repository.weather
 
+import com.lunacattus.app.domain.model.weather.CityInfo
 import com.lunacattus.app.domain.model.weather.WeatherInfo
+import kotlinx.coroutines.flow.Flow
 
 interface IWeatherRepository {
-    suspend fun getWeather(cityCode: String): Result<WeatherInfo>
-    suspend fun getWeather(): Result<WeatherInfo>
+    fun getWeather(): Result<Flow<WeatherInfo?>>
+    suspend fun requestCurrentWeatherInfo(): Result<Unit>
+    suspend fun searchCity(keyword: String): Result<List<CityInfo>>
 }

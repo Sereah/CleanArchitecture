@@ -34,7 +34,7 @@ class HomeFragment :
     override fun handleSideEffect(effect: HomeSideEffect) {
         when (effect) {
             HomeSideEffect.NavigateToWeatherFeature -> {
-                getNavCoordinator().execute(
+                navCoordinator().execute(
                     NavCommand.ToDirection(
                         object : NavDirections {
                             override val actionId: Int = R.id.action_home_to_weather

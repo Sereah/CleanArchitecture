@@ -55,3 +55,16 @@ data class Cast(
     @SerializedName("daypower") val dayWindPower: String,
     @SerializedName("nightpower") val nightWindPower: String,
 )
+
+data class GaoDeSearchCityDTO(
+    val status: Int,
+    val info: String,
+    @SerializedName("infocode") val infoCode: Int,
+    @SerializedName("pois") val poiList: List<Poi>,
+)
+
+data class Poi(
+    @SerializedName("adname") val adName: String,
+    @SerializedName("adcode") val adCode: Int,
+    @SerializedName("pname") val pName: String
+)

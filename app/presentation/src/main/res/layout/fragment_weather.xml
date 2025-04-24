@@ -6,6 +6,15 @@
     android:layout_height="match_parent"
     tools:context="com.lunacattus.app.presentation.features.weather.ui.WeatherFragment">
 
+    <ImageView
+        android:id="@+id/option"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:layout_marginEnd="24dp"
+        app:layout_constraintBottom_toBottomOf="@id/title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/title" />
+
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"

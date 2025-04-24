@@ -16,6 +16,8 @@ import com.lunacattus.common.toChineseOrEmpty
 class DailyWeatherListAdapter(val context: Context) :
     ListAdapter<DailyForecast, DailyWeatherListAdapter.ViewHolder>(diffCallback) {
 
+    private var useBlackColor = false
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -37,7 +39,10 @@ class DailyWeatherListAdapter(val context: Context) :
         binding.week.text = if (item.date.isToday()) {
             context.getString(R.string.today)
         } else {
-            context.getString(R.string.week, item.week.toChineseOrEmpty())
+            context.getString(
+                R.string.week,
+                if (item.week.toChineseOrEmpty() == "七") "日" else item.week.toChineseOrEmpty()
+            )
         }
         val weatherImg = when (item.condition) {
             WeatherCondition.SUNNY -> R.drawable.img_sunny_small
@@ -49,10 +54,21 @@ class DailyWeatherListAdapter(val context: Context) :
         binding.imgWeather.setImageResource(weatherImg)
         binding.temp.text =
             context.getString(R.string.temp_min_to_max, item.minTemp.toInt(), item.maxTemp.toInt())
+        if (useBlackColor) {
+            binding.week.setTextColor(context.getColor(R.color.black))
+            binding.temp.setTextColor(context.getColor(R.color.black))
+        } else {
+            binding.week.setTextColor(context.getColor(R.color.white))
+            binding.temp.setTextColor(context.getColor(R.color.white))
+        }
     }
 
     inner class ViewHolder(val binding: ItemWeatherDailyBinding) :
         RecyclerView.ViewHolder(binding.root)
+
+    fun notifyTextColor(isBlack: Boolean) {
+        useBlackColor = isBlack
+    }
 
     companion object {
         private val diffCallback = object : DiffUtil.ItemCallback<DailyForecast>() {

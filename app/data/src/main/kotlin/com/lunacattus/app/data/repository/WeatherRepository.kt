@@ -1,4 +1,4 @@
-package com.lunacattus.app.data.repository.weather
+package com.lunacattus.app.data.repository
 
 import com.lunacattus.app.data.local.datasource.WeatherLocalDataSource
 import com.lunacattus.app.data.mapper.WeatherMapper.mapperToEntity
@@ -6,9 +6,9 @@ import com.lunacattus.app.data.mapper.WeatherMapper.mapperToModel
 import com.lunacattus.app.data.remote.datasource.GaoDeWeatherRemoteDataSource
 import com.lunacattus.app.data.remote.dto.GaoDeDailyWeatherDTO
 import com.lunacattus.app.data.remote.dto.GaoDeLiveWeatherDTO
-import com.lunacattus.app.domain.model.weather.CityInfo
-import com.lunacattus.app.domain.model.weather.WeatherException
-import com.lunacattus.app.domain.model.weather.WeatherInfo
+import com.lunacattus.app.domain.model.CityInfo
+import com.lunacattus.app.domain.model.WeatherException
+import com.lunacattus.app.domain.model.WeatherInfo
 import com.lunacattus.app.domain.repository.weather.IWeatherRepository
 import com.lunacattus.clean.common.Logger
 import kotlinx.coroutines.Dispatchers

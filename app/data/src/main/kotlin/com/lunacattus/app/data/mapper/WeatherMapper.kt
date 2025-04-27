@@ -6,11 +6,11 @@ import com.lunacattus.app.data.local.entity.WeatherWithDailyWeather
 import com.lunacattus.app.data.remote.dto.GaoDeDailyWeatherDTO
 import com.lunacattus.app.data.remote.dto.GaoDeLiveWeatherDTO
 import com.lunacattus.app.data.remote.dto.GaoDeSearchCityDTO
-import com.lunacattus.app.domain.model.weather.CityInfo
-import com.lunacattus.app.domain.model.weather.DailyForecast
-import com.lunacattus.app.domain.model.weather.WeatherCondition
-import com.lunacattus.app.domain.model.weather.WeatherInfo
-import com.lunacattus.app.domain.model.weather.WindDirection
+import com.lunacattus.app.domain.model.CityInfo
+import com.lunacattus.app.domain.model.DailyForecast
+import com.lunacattus.app.domain.model.WeatherCondition
+import com.lunacattus.app.domain.model.WeatherInfo
+import com.lunacattus.app.domain.model.WindDirection
 import com.lunacattus.common.parseToTimestamp
 
 object WeatherMapper {

@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil.ItemCallback
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.lunacattus.app.domain.model.weather.CityInfo
+import com.lunacattus.app.domain.model.CityInfo
 import com.lunacattus.clean.presentation.R
 import com.lunacattus.clean.presentation.databinding.ItemSearchCityResultBinding
 

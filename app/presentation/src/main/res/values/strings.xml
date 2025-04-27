@@ -27,4 +27,7 @@
     <string name="current_location">当前定位</string>
     <string name="added_city">已添加城市</string>
     <string name="cancel">取消</string>
+    <string name="ok">好的</string>
+    <string name="location_permission_msg">天气信息需要使用大致位置信息权限</string>
+    <string name="permission_goto_setting_msg">你需要在设置中手动打开相关权限</string>
 </resources>

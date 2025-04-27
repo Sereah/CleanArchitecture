@@ -11,8 +11,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.github.promeg.pinyinhelper.Pinyin
 import com.github.promeg.tinypinyin.lexicons.android.cncity.CnCityDict
-import com.lunacattus.app.domain.model.weather.WeatherCondition
-import com.lunacattus.app.domain.model.weather.WeatherInfo
+import com.lunacattus.app.domain.model.WeatherCondition
+import com.lunacattus.app.domain.model.WeatherInfo
 import com.lunacattus.app.presentation.common.navigation.NavCommand
 import com.lunacattus.app.presentation.common.ui.UniformItemDecoration
 import com.lunacattus.app.presentation.common.ui.base.BaseFragment
@@ -41,6 +41,7 @@ class WeatherFragment :
 
     override fun setupViews(savedInstanceState: Bundle?) {
         Pinyin.init(Pinyin.newConfig().with(CnCityDict.getInstance(requireContext())))
+        dispatchUiIntent(WeatherUiIntent.OnLocationRequested)
         adapter = DailyWeatherListAdapter(requireContext()).apply {
             binding.dailyList.adapter = this
         }

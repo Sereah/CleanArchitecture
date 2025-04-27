@@ -1,7 +1,7 @@
 package com.lunacattus.app.domain.repository.weather
 
-import com.lunacattus.app.domain.model.weather.CityInfo
-import com.lunacattus.app.domain.model.weather.WeatherInfo
+import com.lunacattus.app.domain.model.CityInfo
+import com.lunacattus.app.domain.model.WeatherInfo
 import kotlinx.coroutines.flow.Flow
 
 interface IWeatherRepository {

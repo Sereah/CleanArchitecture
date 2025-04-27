@@ -1,4 +1,4 @@
-package com.lunacattus.app.domain.model.weather
+package com.lunacattus.app.domain.model
 
 data class WeatherInfo(
     val adCode: Int,

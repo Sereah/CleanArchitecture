@@ -1,6 +1,6 @@
 package com.lunacattus.app.domain.usecase.weather
 
-import com.lunacattus.app.domain.model.weather.WeatherInfo
+import com.lunacattus.app.domain.model.WeatherInfo
 import com.lunacattus.app.domain.repository.weather.IWeatherRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

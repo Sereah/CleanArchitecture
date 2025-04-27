@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.lunacattus.app.domain.model.weather.DailyForecast
-import com.lunacattus.app.domain.model.weather.WeatherCondition
+import com.lunacattus.app.domain.model.DailyForecast
+import com.lunacattus.app.domain.model.WeatherCondition
 import com.lunacattus.clean.presentation.R
 import com.lunacattus.clean.presentation.databinding.ItemWeatherDailyBinding
 import com.lunacattus.common.isToday

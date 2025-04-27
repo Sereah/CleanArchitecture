@@ -1,7 +1,7 @@
 package com.lunacattus.app.presentation.features.weather.mvi
 
-import com.lunacattus.app.domain.model.weather.CityInfo
-import com.lunacattus.app.domain.model.weather.WeatherInfo
+import com.lunacattus.app.domain.model.CityInfo
+import com.lunacattus.app.domain.model.WeatherInfo
 import com.lunacattus.app.presentation.common.ui.base.IUiState
 
 data class WeatherUiState(

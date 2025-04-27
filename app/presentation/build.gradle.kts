@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.tinypinyin.core)
     implementation(libs.tinypinyin.android)
+    implementation (libs.permissionx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

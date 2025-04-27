@@ -1,7 +1,8 @@
 package com.lunacattus.app.presentation.features.weather.viewmodel
 
 import androidx.lifecycle.viewModelScope
-import com.lunacattus.app.domain.model.weather.WeatherException
+import com.lunacattus.app.domain.model.WeatherException
+import com.lunacattus.app.domain.usecase.location.RequestLocationUseCase
 import com.lunacattus.app.domain.usecase.weather.GetCurrentWeatherUseCase
 import com.lunacattus.app.domain.usecase.weather.RequestWeatherUseCase
 import com.lunacattus.app.domain.usecase.weather.SearchCityUseCase
@@ -18,7 +19,8 @@ import javax.inject.Inject
 class WeatherViewModel @Inject constructor(
     private val getCurrentWeatherUseCase: GetCurrentWeatherUseCase,
     private val requestWeatherUseCase: RequestWeatherUseCase,
-    private val searchCityUseCase: SearchCityUseCase
+    private val searchCityUseCase: SearchCityUseCase,
+    private val locationUseCase: RequestLocationUseCase
 ) : BaseViewModel<WeatherUiIntent, WeatherUiState, WeatherSideEffect>() {
 
     init {
@@ -36,6 +38,14 @@ class WeatherViewModel @Inject constructor(
 
             is WeatherUiIntent.OnSearchCityRequested -> {
                 searchCity(intent.keyword)
+            }
+
+            WeatherUiIntent.OnLocationRequested -> {
+                viewModelScope.launch {
+                    locationUseCase.invoke().collect {
+                        Logger.d(TAG, "location: $it")
+                    }
+                }
             }
         }
     }

@@ -3,6 +3,8 @@ package com.lunacattus.app.data.di
 import android.content.Context
 import android.location.LocationManager
 import com.lunacattus.app.data.remote.api.GaoDeApiService
+import com.lunacattus.app.data.remote.api.QWeatherService
+import com.lunacattus.data.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,6 +26,16 @@ object DataModule {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(GaoDeApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideQWeatherServiceApi(): QWeatherService {
+        return Retrofit.Builder()
+            .baseUrl("https://${BuildConfig.QWeatherHost}/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(QWeatherService::class.java)
     }
 
     @Provides

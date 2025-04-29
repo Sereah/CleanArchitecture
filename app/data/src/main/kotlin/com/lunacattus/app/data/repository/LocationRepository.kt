@@ -29,7 +29,7 @@ class LocationRepository @Inject constructor(
             override fun onLocationChanged(location: android.location.Location) {
                 Logger.d(TAG, "onLocationChanged: $location")
                 val address = getAddress(location)
-                if (address == null) {
+                if (address == null || address.isEmpty()) {
                     trySend(location.mapper())
                 } else {
                     trySend(address[0].mapper())
@@ -47,7 +47,7 @@ class LocationRepository @Inject constructor(
             Logger.d(TAG, "getLastKnownLocation: $location")
             location?.let {
                 val address = getAddress(it)
-                if (address == null) {
+                if (address == null || address.isEmpty()) {
                     trySend(it.mapper())
                 } else {
                     trySend(address[0].mapper())

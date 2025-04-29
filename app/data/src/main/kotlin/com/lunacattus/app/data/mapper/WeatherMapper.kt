@@ -1,11 +1,19 @@
 package com.lunacattus.app.data.mapper
 
-import com.lunacattus.app.data.local.entity.DailyWeatherEntity
-import com.lunacattus.app.data.local.entity.WeatherEntity
-import com.lunacattus.app.data.local.entity.WeatherWithDailyWeather
+import com.lunacattus.app.data.local.entity.GaoDeDailyWeatherEntity
+import com.lunacattus.app.data.local.entity.QWeatherDailyEntity
+import com.lunacattus.app.data.local.entity.QWeatherHourlyEntity
+import com.lunacattus.app.data.local.entity.QWeatherLocationEntity
+import com.lunacattus.app.data.local.entity.QWeatherNowEntity
+import com.lunacattus.app.data.local.entity.GaoDeLiveWeatherEntity
+import com.lunacattus.app.data.local.entity.GaoDeWeatherWithDailyWeather
 import com.lunacattus.app.data.remote.dto.GaoDeDailyWeatherDTO
 import com.lunacattus.app.data.remote.dto.GaoDeLiveWeatherDTO
 import com.lunacattus.app.data.remote.dto.GaoDeSearchCityDTO
+import com.lunacattus.app.data.remote.dto.QWeatherDailyDTO
+import com.lunacattus.app.data.remote.dto.QWeatherGeoDTO
+import com.lunacattus.app.data.remote.dto.QWeatherHourlyDTO
+import com.lunacattus.app.data.remote.dto.QWeatherNowDTO
 import com.lunacattus.app.domain.model.CityInfo
 import com.lunacattus.app.domain.model.DailyForecast
 import com.lunacattus.app.domain.model.WeatherCondition
@@ -15,8 +23,92 @@ import com.lunacattus.common.parseToTimestamp
 
 object WeatherMapper {
 
-    fun GaoDeLiveWeatherDTO.mapperToEntity(): WeatherEntity {
-        return WeatherEntity(
+    fun QWeatherGeoDTO.mapperToEntity(): List<QWeatherLocationEntity> {
+        return this.location.map {
+            QWeatherLocationEntity(
+                locationId = it.id,
+                name = it.name,
+                lat = it.lat,
+                lon = it.lon,
+                country = it.country,
+                province = it.provence,
+                city = it.city,
+                timeZone = it.timeZone
+            )
+        }
+    }
+
+    fun QWeatherNowDTO.mapperToEntity(locationId: String): QWeatherNowEntity {
+        return QWeatherNowEntity(
+            locationId = locationId,
+            obsTime = this.now.obsTime,
+            temp = this.now.temp,
+            feelsTemp = this.now.feelsTemp,
+            text = this.now.text,
+            wind360 = this.now.wind360,
+            windScale = this.now.windScale,
+            windSpeed = this.now.windSpeed,
+            humidity = this.now.humidity,
+            preCip = this.now.preCip,
+            pressure = this.now.pressure,
+            vis = this.now.vis,
+            cloud = this.now.cloud,
+            dew = this.now.dew
+        )
+    }
+
+    fun QWeatherDailyDTO.mapperToEntity(locationId: String): List<QWeatherDailyEntity> {
+        return this.daily.map {
+            QWeatherDailyEntity(
+                locationId = locationId,
+                fxDate = it.fxDate,
+                sunrise = it.sunrise,
+                sunset = it.sunset,
+                moonrise = it.moonrise,
+                moonSet = it.moonSet,
+                moonPhase = it.moonPhase,
+                tempMax = it.tempMax,
+                tempMin = it.tempMin,
+                textDay = it.textDay,
+                textNight = it.textNight,
+                wind360Day = it.wind360Day,
+                windScaleDay = it.windScaleDay,
+                windSpeedDay = it.windSpeedDay,
+                wind360Night = it.wind360Night,
+                windScaleNight = it.windScaleNight,
+                windSpeedNight = it.windSpeedNight,
+                humidity = it.humidity,
+                preCip = it.preCip,
+                pressure = it.pressure,
+                vis = it.vis,
+                cloud = it.cloud,
+                uvIndex = it.uvIndex
+            )
+        }
+    }
+
+    fun QWeatherHourlyDTO.mapperToEntity(locationId: String): List<QWeatherHourlyEntity> {
+        return this.hourly.map {
+            QWeatherHourlyEntity(
+                locationId = locationId,
+                fxTime = it.fxTime,
+                temp = it.temp,
+                text = it.text,
+                wind360 = it.wind360,
+                windScale = it.windScale,
+                windSpeed = it.windSpeed,
+                humidity = it.humidity,
+                pop = it.pop,
+                preCip = it.preCip,
+                pressure = it.pressure,
+                cloud = it.cloud,
+                dew = it.dew
+            )
+        }
+    }
+
+    fun GaoDeLiveWeatherDTO.mapperToEntity(): GaoDeLiveWeatherEntity {
+        return GaoDeLiveWeatherEntity(
             adCode = this.lives[0].adCode.toInt(),
             provence = this.lives[0].province,
             city = this.lives[0].city,
@@ -30,10 +122,10 @@ object WeatherMapper {
         )
     }
 
-    fun GaoDeDailyWeatherDTO.mapperToEntity(): List<DailyWeatherEntity> {
+    fun GaoDeDailyWeatherDTO.mapperToEntity(): List<GaoDeDailyWeatherEntity> {
         return this.forecasts.flatMap { forecast ->
             forecast.casts.map { cast ->
-                DailyWeatherEntity(
+                GaoDeDailyWeatherEntity(
                     adCode = forecast.adCode.toInt(),
                     date = cast.date,
                     week = cast.week,
@@ -62,7 +154,7 @@ object WeatherMapper {
         }
     }
 
-    fun WeatherWithDailyWeather.mapperToModel(): WeatherInfo {
+    fun GaoDeWeatherWithDailyWeather.mapperToModel(): WeatherInfo {
         return WeatherInfo(
             adCode = this.weather.adCode,
             provence = this.weather.provence,
@@ -77,7 +169,7 @@ object WeatherMapper {
         )
     }
 
-    private fun mapperDailyForecast(forecasts: List<DailyWeatherEntity>): List<DailyForecast> {
+    private fun mapperDailyForecast(forecasts: List<GaoDeDailyWeatherEntity>): List<DailyForecast> {
         return forecasts.map {
             DailyForecast(
                 date = it.date.parseToTimestamp() ?: -1L,
@@ -116,7 +208,7 @@ object WeatherMapper {
                 "东北" -> WindDirection.NORTHEAST
                 "西南" -> WindDirection.SOUTHWEST
                 "西北" -> WindDirection.NORTHWEST
-                "旋转不定" -> WindDirection.INSTABILITY
+                "旋转不定" -> WindDirection.ROTATIONAL
                 else -> WindDirection.NONE
             }
         }

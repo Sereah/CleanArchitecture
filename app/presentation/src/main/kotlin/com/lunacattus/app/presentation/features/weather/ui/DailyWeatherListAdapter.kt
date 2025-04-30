@@ -6,15 +6,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.lunacattus.app.domain.model.DailyForecast
-import com.lunacattus.app.domain.model.WeatherCondition
-import com.lunacattus.clean.presentation.R
+import com.lunacattus.app.domain.model.DailyWeather
 import com.lunacattus.clean.presentation.databinding.ItemWeatherDailyBinding
-import com.lunacattus.common.isToday
-import com.lunacattus.common.toChineseOrEmpty
 
 class DailyWeatherListAdapter(val context: Context) :
-    ListAdapter<DailyForecast, DailyWeatherListAdapter.ViewHolder>(diffCallback) {
+    ListAdapter<DailyWeather, DailyWeatherListAdapter.ViewHolder>(diffCallback) {
 
     private var useBlackColor = false
 
@@ -36,31 +32,7 @@ class DailyWeatherListAdapter(val context: Context) :
     ) {
         val item = getItem(position)
         val binding = holder.binding
-        binding.week.text = if (item.date.isToday()) {
-            context.getString(R.string.today)
-        } else {
-            context.getString(
-                R.string.week,
-                if (item.week.toChineseOrEmpty() == "七") "日" else item.week.toChineseOrEmpty()
-            )
-        }
-        val weatherImg = when (item.condition) {
-            WeatherCondition.SUNNY -> R.drawable.img_sunny_small
-            WeatherCondition.RAINY,
-            WeatherCondition.THUNDERSTORM -> R.drawable.img_rain_small
 
-            else -> R.drawable.img_cloudy_small
-        }
-        binding.imgWeather.setImageResource(weatherImg)
-        binding.temp.text =
-            context.getString(R.string.temp_min_to_max, item.minTemp.toInt(), item.maxTemp.toInt())
-        if (useBlackColor) {
-            binding.week.setTextColor(context.getColor(R.color.black))
-            binding.temp.setTextColor(context.getColor(R.color.black))
-        } else {
-            binding.week.setTextColor(context.getColor(R.color.white))
-            binding.temp.setTextColor(context.getColor(R.color.white))
-        }
     }
 
     inner class ViewHolder(val binding: ItemWeatherDailyBinding) :
@@ -71,23 +43,21 @@ class DailyWeatherListAdapter(val context: Context) :
     }
 
     companion object {
-        private val diffCallback = object : DiffUtil.ItemCallback<DailyForecast>() {
+        private val diffCallback = object : DiffUtil.ItemCallback<DailyWeather>() {
             override fun areItemsTheSame(
-                oldItem: DailyForecast,
-                newItem: DailyForecast
+                oldItem: DailyWeather,
+                newItem: DailyWeather
             ): Boolean {
-                return oldItem.date == newItem.date
+                return oldItem == newItem
             }
 
             override fun areContentsTheSame(
-                oldItem: DailyForecast,
-                newItem: DailyForecast
+                oldItem: DailyWeather,
+                newItem: DailyWeather
             ): Boolean {
-                return oldItem.week == newItem.week &&
-                        oldItem.condition == newItem.condition &&
-                        oldItem.minTemp == newItem.minTemp &&
-                        oldItem.maxTemp == newItem.maxTemp
+                return oldItem == newItem
             }
+
 
         }
     }

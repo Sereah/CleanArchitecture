@@ -8,6 +8,7 @@ import androidx.room.Transaction
 import com.lunacattus.app.data.local.entity.GaoDeDailyWeatherEntity
 import com.lunacattus.app.data.local.entity.GaoDeLiveWeatherEntity
 import com.lunacattus.app.data.local.entity.GaoDeWeatherWithDailyWeather
+import com.lunacattus.app.data.local.entity.QWeatherCombinedData
 import com.lunacattus.app.data.local.entity.QWeatherDailyEntity
 import com.lunacattus.app.data.local.entity.QWeatherHourlyEntity
 import com.lunacattus.app.data.local.entity.QWeatherLocationEntity
@@ -31,7 +32,7 @@ interface WeatherDao {
     suspend fun clearGaoDeDailyWeather(adCode: Int)
 
     @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
-    suspend fun insertQWeatherLocation(weatherLocation: List<QWeatherLocationEntity>): List<Long>
+    suspend fun insertQWeatherLocation(weatherLocation: QWeatherLocationEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun insertQWeatherNow(weatherNow: QWeatherNowEntity): Long
@@ -50,4 +51,8 @@ interface WeatherDao {
 
     @Query("DELETE FROM q_weather_hourly WHERE locationId = :locationId")
     suspend fun clearQWeatherHourly(locationId: String)
+
+    @Transaction
+    @Query("SELECT * FROM q_weather_location WHERE isCurrentLocation = 1")
+    fun getCurrentLocationWeather(): Flow<QWeatherCombinedData?>
 }

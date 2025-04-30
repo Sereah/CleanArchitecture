@@ -16,15 +16,15 @@ class QWeatherRemoteDataSource @Inject constructor(
         return service.getGeo("$lat,$lon")
     }
 
-    suspend fun getNowWeather(lat: Double, lon: Double): QWeatherNowDTO {
-        return service.getNowWeather("$lat,$lon")
+    suspend fun getNowWeather(locationId: String): QWeatherNowDTO {
+        return service.getNowWeather(locationId)
     }
 
-    suspend fun getDailyWeather(lat: Double, lon: Double): QWeatherDailyDTO {
-        return service.getDailyWeather("$lat,$lon")
+    suspend fun getDailyWeather(locationId: String): QWeatherDailyDTO {
+        return service.getDailyWeather(locationId)
     }
 
-    suspend fun getHourlyWeather(lat: Double, lon: Double): QWeatherHourlyDTO {
-        return service.getHourlyWeather("$lat,$lon")
+    suspend fun getHourlyWeather(locationId: String): QWeatherHourlyDTO {
+        return service.getHourlyWeather(locationId)
     }
 }

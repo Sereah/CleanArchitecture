@@ -8,6 +8,7 @@ import com.lunacattus.app.data.local.entity.QWeatherLocationEntity
 import com.lunacattus.app.data.local.entity.QWeatherNowEntity
 import com.lunacattus.app.data.local.entity.GaoDeLiveWeatherEntity
 import com.lunacattus.app.data.local.entity.GaoDeWeatherWithDailyWeather
+import com.lunacattus.app.data.local.entity.QWeatherCombinedData
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -32,28 +33,26 @@ class WeatherLocalDataSource @Inject constructor(
         return weatherDao.getGaoDeLastWeatherWithDailyWeather()
     }
 
-    suspend fun insertQWeatherLocation(weatherLocation: List<QWeatherLocationEntity>): List<Long> {
+    suspend fun insertQWeatherLocation(weatherLocation: QWeatherLocationEntity): Long {
         return weatherDao.insertQWeatherLocation(weatherLocation)
     }
 
-    suspend fun insertQWeatherNow(locationId: String, weatherNow: QWeatherNowEntity): Long {
-        weatherDao.clearQWeatherNow(locationId)
+    suspend fun insertQWeatherNow(weatherNow: QWeatherNowEntity): Long {
+        weatherDao.clearQWeatherNow(weatherNow.locationId)
         return weatherDao.insertQWeatherNow(weatherNow)
     }
 
-    suspend fun insertQWeatherDaily(
-        locationId: String,
-        weatherDaily: List<QWeatherDailyEntity>
-    ): List<Long> {
-        weatherDao.clearQWeatherDaily(locationId)
+    suspend fun insertQWeatherDaily(weatherDaily: List<QWeatherDailyEntity>): List<Long> {
+        weatherDao.clearQWeatherDaily(weatherDaily[0].locationId)
         return weatherDao.insertQWeatherDaily(weatherDaily)
     }
 
-    suspend fun insertQWeatherHourly(
-        locationId: String,
-        weatherHourly: List<QWeatherHourlyEntity>
-    ): List<Long> {
-        weatherDao.clearQWeatherHourly(locationId)
+    suspend fun insertQWeatherHourly(weatherHourly: List<QWeatherHourlyEntity>): List<Long> {
+        weatherDao.clearQWeatherHourly(weatherHourly[0].locationId)
         return weatherDao.insertQWeatherHourly(weatherHourly)
+    }
+
+    fun getCurrentLocationWeather(): Flow<QWeatherCombinedData?> {
+        return weatherDao.getCurrentLocationWeather()
     }
 }

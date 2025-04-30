@@ -8,4 +8,5 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <!--允许程序访问精确定位, 动态申请-->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 </manifest>

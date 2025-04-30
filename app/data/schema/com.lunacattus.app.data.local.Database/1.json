@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "5e77312863c5b23a6c311bb4c66be572",
+    "identityHash": "8e9030ab8cfd9e9051cfcb0f5b99927f",
     "entities": [
       {
         "tableName": "gao_de_live_weather",
@@ -187,7 +187,7 @@
       },
       {
         "tableName": "q_weather_location",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`locationId` TEXT NOT NULL, `name` TEXT NOT NULL, `lat` REAL NOT NULL, `lon` REAL NOT NULL, `country` TEXT NOT NULL, `province` TEXT NOT NULL, `city` TEXT NOT NULL, `timeZone` TEXT NOT NULL, PRIMARY KEY(`locationId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`locationId` TEXT NOT NULL, `name` TEXT NOT NULL, `lat` REAL NOT NULL, `lon` REAL NOT NULL, `country` TEXT NOT NULL, `province` TEXT NOT NULL, `city` TEXT NOT NULL, `timeZone` TEXT NOT NULL, `isCurrentLocation` INTEGER NOT NULL, PRIMARY KEY(`locationId`))",
         "fields": [
           {
             "fieldPath": "locationId",
@@ -235,6 +235,12 @@
             "fieldPath": "timeZone",
             "columnName": "timeZone",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isCurrentLocation",
+            "columnName": "isCurrentLocation",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -641,7 +647,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5e77312863c5b23a6c311bb4c66be572')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8e9030ab8cfd9e9051cfcb0f5b99927f')"
     ]
   }
 }

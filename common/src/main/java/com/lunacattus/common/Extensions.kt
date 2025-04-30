@@ -12,6 +12,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
@@ -19,12 +20,8 @@ import kotlin.math.roundToInt
 
 /**
  * 将日期时间字符串解析为时间戳（Long）
- * 支持格式：
- * 1. yyyy-MM-dd HH:mm:ss → 转为 LocalDateTime 的时间戳
- * 2. yyyy-MM-dd → 转为 LocalDate 的时间戳（默认时间设为 00:00:00）
- * 3. HH:mm:ss → 转为当天的时间戳（日期为当前日期）
  */
-fun String.parseToTimestamp(): Long? {
+fun String.parseToTimestamp(): Long {
     return try {
         when {
             // 格式：yyyy-MM-dd HH:mm:ss
@@ -52,11 +49,34 @@ fun String.parseToTimestamp(): Long? {
                     .toInstant()
                     .toEpochMilli()
             }
+            // 格式：HH:mm
+            matches(Regex("^\\d{2}:\\d{2}$")) -> {
+                LocalTime
+                    .parse(this, DateTimeFormatter.ofPattern("HH:mm"))
+                    .atDate(LocalDate.now()) // 使用当前日期
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant()
+                    .toEpochMilli()
+            }
+            // 格式：yyyy-MM-ddTHH:mm:ssXXX（带时区偏移量）
+            matches(Regex("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}[-+]\\d{2}:\\d{2}$")) -> {
+                OffsetDateTime
+                    .parse(this, DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+                    .toInstant()
+                    .toEpochMilli()
+            }
+            // 格式：yyyy-MM-ddTHH:mmXXX（带时区偏移量）
+            matches(Regex("^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}[-+]\\d{2}:\\d{2}$")) -> {
+                OffsetDateTime
+                    .parse(this, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mmXXX"))
+                    .toInstant()
+                    .toEpochMilli()
+            }
 
-            else -> null // 格式不匹配
+            else -> -1L // 格式不匹配
         }
     } catch (_: DateTimeParseException) {
-        null // 解析失败
+        -1L // 解析失败
     }
 }
 
@@ -66,6 +86,16 @@ fun String.parseToTimestamp(): Long? {
  */
 fun Long.toFormattedDateTime(format: String = "yyyy-MM-dd HH:mm:ss"): String {
     val formatter = DateTimeFormatter.ofPattern(format)
+    return Instant.ofEpochMilli(this)
+        .atZone(ZoneId.systemDefault())
+        .format(formatter)
+}
+
+/**
+ * 将时间戳（Long）转换为 ISO 8601 格式（yyyy-MM-ddTHH:mm:ssXXX）
+ */
+fun Long.toIso8601DateTime(): String {
+    val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
     return Instant.ofEpochMilli(this)
         .atZone(ZoneId.systemDefault())
         .format(formatter)

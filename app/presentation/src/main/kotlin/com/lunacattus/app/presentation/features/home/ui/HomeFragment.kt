@@ -48,7 +48,7 @@ class HomeFragment :
     private fun checkLocationPermission() {
         PermissionX.init(this)
             .permissions(
-                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION,
             )
             .explainReasonBeforeRequest()
             .onExplainRequestReason { scope, deniedList ->

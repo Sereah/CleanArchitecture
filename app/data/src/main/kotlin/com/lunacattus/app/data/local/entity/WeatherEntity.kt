@@ -16,6 +16,7 @@ data class QWeatherLocationEntity(
     val province: String,
     val city: String,
     val timeZone: String,
+    val isCurrentLocation: Boolean
 )
 
 @Entity(
@@ -113,6 +114,27 @@ data class QWeatherHourlyEntity(
     val dew: Int
 )
 
+data class QWeatherCombinedData(
+    @Embedded val location: QWeatherLocationEntity,
+    @Relation(
+        parentColumn = "locationId",
+        entityColumn = "locationId",
+        entity = QWeatherNowEntity::class
+    )
+    val now: QWeatherNowEntity?,
+    @Relation(
+        parentColumn = "locationId",
+        entityColumn = "locationId",
+        entity = QWeatherDailyEntity::class
+    )
+    val daily: List<QWeatherDailyEntity>,
+    @Relation(
+        parentColumn = "locationId",
+        entityColumn = "locationId",
+        entity = QWeatherHourlyEntity::class
+    )
+    val hourly: List<QWeatherHourlyEntity>
+)
 
 @Entity(tableName = "gao_de_live_weather")
 data class GaoDeLiveWeatherEntity(

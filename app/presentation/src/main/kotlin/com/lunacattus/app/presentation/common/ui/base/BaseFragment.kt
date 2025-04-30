@@ -16,7 +16,8 @@ import com.lunacattus.app.presentation.common.ui.dialog.DialogShareViewModel
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 abstract class BaseFragment<
@@ -31,7 +32,7 @@ abstract class BaseFragment<
     private var _binding: VB? = null
     protected val binding get() = _binding!!
     private val dialogViewModel: DialogShareViewModel by activityViewModels()
-    protected abstract val viewModel: VM
+    abstract val viewModel: VM
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,27 +59,33 @@ abstract class BaseFragment<
     protected abstract fun setupObservers()
     protected abstract fun handleSideEffect(effect: EFFECT)
 
-    protected inner class UiStateObserver<T>(
-        val selector: (STATE) -> T,
-        val lifecycle: Lifecycle.State = Lifecycle.State.STARTED,
-        val useDistinct: Boolean = true,
-        val filterCondition: (T) -> Boolean = { true },
-        val action: (T) -> Unit
-    )
-
-    protected fun observeUiStates(vararg observers: UiStateObserver<*>) {
-        observers.forEach { observer ->
-            viewLifecycleOwner.lifecycleScope.launch {
-                observer.handleObservation()
+    protected inline fun <reified T : STATE, R> collectState(
+        crossinline mapFn: (T) -> R,
+        crossinline filterFn: (R) -> Boolean = { true },
+        noinline collectFn: (R) -> Unit
+    ) {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState
+                    .filterIsInstance<T>()
+                    .map { mapFn(it) }
+                    .filter { filterFn(it) }
+                    .distinctUntilChanged()
+                    .collect { collectFn(it) }
             }
         }
+    }
+
+    protected inline fun <reified T : STATE> collectState(
+        crossinline filterFn: (T) -> Boolean = { true },
+        noinline collectFn: (T) -> Unit
+    ) {
+        collectState<T, T>(mapFn = { it }, filterFn = filterFn, collectFn = collectFn)
     }
 
     protected fun dispatchUiIntent(intent: INTENT) {
         viewModel.handleUiIntent(intent)
     }
-
-    protected fun dialogResultState() = dialogViewModel.resultState
 
     protected fun navCoordinator(): NavCoordinator {
         val entryPoint = EntryPointAccessors.fromActivity(
@@ -88,6 +95,8 @@ abstract class BaseFragment<
         return entryPoint.navCoordinator()
     }
 
+    protected fun dialogResultState() = dialogViewModel.resultState
+
     private fun observeSideEffect() {
         viewLifecycleOwner.lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -95,18 +104,6 @@ abstract class BaseFragment<
                     handleSideEffect(effect)
                 }
             }
-        }
-    }
-
-    private suspend fun <T> UiStateObserver<T>.handleObservation() {
-        viewLifecycleOwner.lifecycle.repeatOnLifecycle(lifecycle) {
-            var flow = viewModel.uiState
-                .mapNotNull { selector(it) }
-                .filter { filterCondition(it) }
-            if (useDistinct) {
-                flow = flow.distinctUntilChanged()
-            }
-            flow.collect { value -> action(value) }
         }
     }
 }

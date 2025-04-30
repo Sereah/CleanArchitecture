@@ -1,6 +1,15 @@
 package com.lunacattus.app.domain.model
 
-import java.util.TimeZone
+import com.lunacattus.app.domain.model.WeatherText.entries
+import com.lunacattus.app.domain.model.WindDirection.entries
+import com.lunacattus.app.domain.model.WindScale.entries
+
+data class Weather(
+    val geo: WeatherGeo,
+    val nowWeather: NowWeather,
+    val dailyWeather: List<DailyWeather>,
+    val hourlyWeather: List<HourlyWeather>
+)
 
 data class WeatherGeo(
     val name: String,
@@ -8,31 +17,30 @@ data class WeatherGeo(
     val lat: Double,
     val lon: Double,
     val country: String,
-    val provence: String,
+    val province: String,
     val city: String,
-    val timeZone: TimeZone,
-    val nowWeather: NowWeather,
-    val dailyWeather: DailyWeather,
-    val hourlyWeather: HourlyWeather
+    val timeZone: String,
 )
 
 data class NowWeather(
-    val obsTime: Long,
-    val temp: Int,
-    val feelsLike: Int,
-    val weatherText: WeatherText,
-    val windDirection: WindDirection,
-    val windScale: WindScale,
-    val windSpeed: Int, //公里每小时
-    val humidity: Int,
-    val preCip: Float, //过去1小时降水量，默认单位：毫米
-    val pressure: Int, //大气压强，默认单位：百帕
-    val vis: Int, //能见度，默认单位：公里
-    val cloud: Int, //云量，百分比数值。可能为空
-    val dew: Int //露点温度。可能为空
+    val id: String = "",
+    val obsTime: Long = 0L,
+    val temp: Int = 0,
+    val feelsLike: Int = 0,
+    val weatherText: WeatherText = WeatherText.SUNNY,
+    val windDirection: WindDirection = WindDirection.NONE,
+    val windScale: WindScale = WindScale.GALE,
+    val windSpeed: Int = 0, //公里每小时
+    val humidity: Int = 0,
+    val preCip: Float = 0F, //过去1小时降水量，默认单位：毫米
+    val pressure: Int = 0, //大气压强，默认单位：百帕
+    val vis: Int = 0, //能见度，默认单位：公里
+    val cloud: Int = 0, //云量，百分比数值。可能为空
+    val dew: Int = 0 //露点温度。可能为空
 )
 
 data class DailyWeather(
+    val id: String,
     val date: Long,
     val sunrise: Long,
     val sunset: Long,
@@ -58,6 +66,7 @@ data class DailyWeather(
 )
 
 data class HourlyWeather(
+    val id: String,
     val time: Long,
     val temp: Int,
     val weatherText: WeatherText,
@@ -106,26 +115,26 @@ enum class WeatherText(
 }
 
 enum class WindDirection(
-    val degrees: Int,
+    private val degrees: Float,
     private val minDegree: Double? = null,
     private val maxDegree: Double? = null
 ) {
-    NORTH(0, 337.5, 22.5),
-    NORTHEAST(45, 22.5, 67.5),
-    EAST(90, 67.5, 112.5),
-    SOUTHEAST(135, 112.5, 157.5),
-    SOUTH(180, 157.5, 202.5),
-    SOUTHWEST(225, 202.5, 247.5),
-    WEST(270, 247.5, 292.5),
-    NORTHWEST(315, 292.5, 337.5),
-    ROTATIONAL(-999),
-    NONE(-1);
+    NORTH(0f, 337.5, 22.5),
+    NORTHEAST(45f, 22.5, 67.5),
+    EAST(90f, 67.5, 112.5),
+    SOUTHEAST(135f, 112.5, 157.5),
+    SOUTH(180f, 157.5, 202.5),
+    SOUTHWEST(225f, 202.5, 247.5),
+    WEST(270f, 247.5, 292.5),
+    NORTHWEST(315f, 292.5, 337.5),
+    ROTATIONAL(-999f),
+    NONE(-1f);
 
     companion object {
-        fun fromDegrees(degrees: Int): WindDirection {
+        fun fromDegrees(degrees: Float): WindDirection {
             return when (degrees) {
-                -999 -> ROTATIONAL
-                -1 -> NONE
+                -999f -> ROTATIONAL
+                -1f -> NONE
                 else -> {
                     val normalized = (degrees % 360 + 360) % 360
                     entries.firstOrNull { it.contains(normalized) } ?: NONE
@@ -134,14 +143,14 @@ enum class WindDirection(
         }
     }
 
-    private fun contains(degree: Int): Boolean {
+    private fun contains(degree: Float): Boolean {
         return when (this) {
             NORTH -> degree >= 337.5 || degree < 22.5
             else -> minDegree?.let { min ->
                 maxDegree?.let { max ->
                     degree >= min && degree <= max
                 }
-            } ?: false
+            } == true
         }
     }
 
@@ -189,55 +198,23 @@ enum class WindScale(
                     input.contains("-") -> {
                         val (start, end) = input.split("-").map { it.toInt() }
                         entries.firstOrNull { start in it.levelRange || end in it.levelRange }
-                            ?.apply { originalInput = input } ?: CALM.apply { originalInput = input }
+                            ?.apply { originalInput = input } ?: CALM.apply {
+                            originalInput = input
+                        }
                     }
+
                     else -> {
                         entries.firstOrNull { input.toInt() in it.levelRange }
-                            ?.apply { originalInput = input } ?: CALM.apply { originalInput = input }
+                            ?.apply { originalInput = input } ?: CALM.apply {
+                            originalInput = input
+                        }
                     }
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 CALM.apply { originalInput = input }
             }
         }
     }
 
     override fun toString(): String = chineseTerm
-}
-
-
-data class WeatherInfo(
-    val adCode: Int,
-    val provence: String,
-    val city: String,
-    val condition: WeatherCondition,
-    val temperature: Float,
-    val windDirection: WindDirection,
-    val windPower: String,
-    val humidity: Int,
-    val dailyForecast: List<DailyForecast> = emptyList(),
-    val updateTime: Long,
-)
-
-data class DailyForecast(
-    val date: Long,
-    val week: Int,
-    val minTemp: Float,
-    val maxTemp: Float,
-    val condition: WeatherCondition
-)
-
-data class CityInfo(
-    val name: String,
-    val pName: String,
-    val adCode: Int
-)
-
-enum class WeatherCondition {
-    SUNNY, CLOUDY, RAINY, SNOWY, THUNDERSTORM, FOGGY, WINDY, UNKNOWN
-}
-
-sealed class WeatherException() : Throwable() {
-    data class ApiError(val code: Int, val msg: String) : WeatherException()
-    data class OtherError(val msg: String) : WeatherException()
 }

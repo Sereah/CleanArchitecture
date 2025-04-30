@@ -5,8 +5,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class RequestAllWeatherInfoUseCase @Inject constructor(private val repository: IWeatherRepository) {
+class RequestNowWeatherInfoUseCase @Inject constructor(private val repository: IWeatherRepository) {
     suspend operator fun invoke(locationId: String): Result<Unit> {
-        return repository.requestAllWeatherInfo(locationId)
+        return repository.requestNowWeatherInfo(locationId)
     }
 }

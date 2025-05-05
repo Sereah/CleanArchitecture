@@ -1,0 +1,101 @@
+@startuml
+title Weather Feature
+
+' presentation
+
+class WeatherViewModel {
+    - getLocationUseCase: GetLocationUseCase
+    - getWeatherGeoUseCase: GetWeatherGeoUseCase
+    - requestWeatherUseCase: RequestWeatherUseCase
+    + observeLocationChange(): Void
+    - getWeatherGeo(lat: Double, lon: Double): WeatherGeo
+    - requestWeather(id: String, isCurrentLocation: Boolean): Void
+}
+
+WeatherViewModel ..> GetLocationUseCase
+WeatherViewModel ..> GetWeatherGeoUseCase
+WeatherViewModel ..> RequestWeatherUseCase
+
+
+' domain
+
+interface ILocationRepository {
+    + getLocation(): Flow<Location>
+}
+
+interface IWeatherRepository {
+    + getWeatherGeo(lat: Double, lon: Double): WeatherGeo
+    + requestWeather(id: Weather): Void
+}
+
+class GetLocationUseCase {
+    - repository: ILocationRepository
+    + invoke(): Flow<Location>
+}
+
+class GetWeatherGeoUseCase {
+    - repository: IWeatherRepository
+    + invoke(lat: Double, lon: Double): WeatherGeo
+}
+
+class RequestWeatherUseCase {
+    - repository: IWeatherRepository
+    + invoke(id: String, isCurrentLocation: Boolean): Void
+}
+
+GetWeatherGeoUseCase ..> IWeatherRepository
+RequestWeatherUseCase ..> IWeatherRepository
+GetLocationUseCase ..> ILocationRepository
+ILocationRepository <|.. LocationRepositroy
+IWeatherRepository <|.. WeatherRepository
+
+
+' data
+
+class LocationRepositroy {
+    - locationManager: LocationManager
+    - appContext: Context
+    + getLocation(): Flow<Location>
+}
+
+class WeatherRepository {
+    - weatherRemoteDataSource: WeatherRemoteDataSource
+    - weatherLocalDataSource: WeatherLocalDataSource
+    + getWeatherGeo(lat: Double, lon: Double): WeatherGeo
+    + requestWeather(id: String, isCurrentLocation: Boolean): Void
+}
+
+class WeatherRemoteDataSource {
+    - qweatherApi: QWeatherApi
+    + getGeo(lat: Double, lon: Double): QWeatherGeoDTO
+    + getNowWeather(locationId: String): QWeatherNowDTO
+    + getDailyWeather(locationId: String): QWeatherDailyDTO
+    + getHourlyWeather(locationId: String): QWeatherHourlyDTO
+}
+
+class WeatherLocalDataSource {
+    - weatherDao: WeatherDao
+    + insertNowWeather(now: QWeatherNowEntity, isCurrentLocation: Boolean): Long
+    + insertDailyWeather(daily: List<QWeatherDailyEntity>, isCurrentLocation: Boolean): List<Long>
+    + insertHourlyWeather(hourly: List<QWeatherHourlyEntity>, isCurrentLocation: Boolean): List<Long>
+}
+
+interface QWeatherApi {
+    + getGeo(location: String): QWeatherGeoDTO
+    + getNowWeather(location: String): QWeatherNowDTO
+    + getDailyWeather(location: String): QWeatherDailyDTO
+    + getHourlyWeather(location: String): QWeatherHourlyDTO
+}
+
+interface WeatherDao {
+    + insertQWeatherNow(now: QWeatherNowEntity): Long
+    + insertQWeatherDaily(daily: List<QWeatherDailyEntity>): List<Long>
+    + insertQWeatherHourly(hourly: List<QWeatherHourlyEntity>): List<Long>
+}
+
+WeatherRepository ..> WeatherRemoteDataSource
+WeatherRepository ..> WeatherLocalDataSource
+WeatherRemoteDataSource ..> QWeatherApi
+WeatherLocalDataSource ..> WeatherDao
+
+@enduml

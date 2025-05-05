@@ -1,4 +1,4 @@
-@startuml
+@startuml weather uml
 title Weather Feature
 
 ' presentation
@@ -88,8 +88,11 @@ interface QWeatherApi {
 }
 
 interface WeatherDao {
+    + deleteOldLocationWeatherNow(): Long
     + insertQWeatherNow(now: QWeatherNowEntity): Long
+    + deleteOldLocationWeatherDaily(): List<Long>
     + insertQWeatherDaily(daily: List<QWeatherDailyEntity>): List<Long>
+    + deleteOldLocationWeatherHourly(): List<Long>
     + insertQWeatherHourly(hourly: List<QWeatherHourlyEntity>): List<Long>
 }
 

@@ -3,6 +3,7 @@ package com.lunacattus.app.presentation.features.weather.ui
 import android.os.Bundle
 import android.widget.Toast
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
+import com.amap.api.maps.MapsInitializer
 import com.lunacattus.app.presentation.common.ui.base.BaseFragment
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherSideEffect
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiIntent
@@ -22,6 +23,8 @@ class WeatherFragment :
     override val viewModel: WeatherViewModel by hiltNavGraphViewModels(R.id.weather_navigation)
 
     override fun setupViews(savedInstanceState: Bundle?) {
+        MapsInitializer.updatePrivacyShow(requireContext(), true, true)
+        MapsInitializer.updatePrivacyAgree(requireContext(), true)
     }
 
     override fun setupObservers() {

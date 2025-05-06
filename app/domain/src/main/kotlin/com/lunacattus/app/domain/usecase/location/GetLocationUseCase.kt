@@ -9,6 +9,6 @@ class GetLocationUseCase @Inject constructor(
     private val repository: ILocationRepository
 ) {
     operator fun invoke(): Flow<Location> {
-        return repository.getLocation()
+        return repository.getLocationByGaoDe()
     }
 }

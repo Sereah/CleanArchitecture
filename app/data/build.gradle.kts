@@ -58,5 +58,10 @@ dependencies {
     implementation(libs.retrofit2.converter.gson)
     implementation(libs.okhttp)
 
+    api(fileTree(mapOf(
+        "dir" to "libs",
+        "include" to listOf("*.jar", "*.aar")
+    )))
+
     implementation(project(":app:domain"))
 }

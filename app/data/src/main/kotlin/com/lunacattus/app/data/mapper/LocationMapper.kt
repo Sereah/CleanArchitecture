@@ -1,6 +1,7 @@
 package com.lunacattus.app.data.mapper
 
 import android.location.Address
+import com.amap.api.location.AMapLocation
 import com.lunacattus.app.data.remote.dto.GaoDeLocationInfoDTO
 import com.lunacattus.app.domain.model.Location
 
@@ -48,6 +49,17 @@ object LocationMapper {
                 ""
             )
         }
+    }
+
+    fun AMapLocation.mapper(): Location {
+        return Location(
+            this.longitude,
+            this.latitude,
+            "",
+            "",
+            "",
+            ""
+        )
     }
 
     private fun extractLanAndLon(input: String): Pair<Double, Double> {

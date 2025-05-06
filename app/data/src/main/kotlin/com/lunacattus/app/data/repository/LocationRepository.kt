@@ -7,6 +7,9 @@ import android.location.Criteria
 import android.location.Geocoder
 import android.location.LocationListener
 import android.location.LocationManager
+import com.amap.api.location.AMapLocationClient
+import com.amap.api.location.AMapLocationClientOption
+import com.amap.api.location.AMapLocationListener
 import com.lunacattus.app.data.mapper.LocationMapper.mapper
 import com.lunacattus.app.data.remote.datasource.GaoDeWeatherRemoteDataSource
 import com.lunacattus.app.domain.model.Location
@@ -28,15 +31,13 @@ class LocationRepository @Inject constructor(
 
     @SuppressLint("MissingPermission")
     override fun getLocation(): Flow<Location> = callbackFlow {
-        val callback = object : LocationListener {
-            override fun onLocationChanged(location: android.location.Location) {
-                Logger.d(TAG, "onLocationChanged: $location")
-                val address = getAddress(location)
-                if (address == null || address.isEmpty()) {
-                    trySend(location.mapper())
-                } else {
-                    trySend(address[0].mapper())
-                }
+        val callback = LocationListener { location ->
+            Logger.d(TAG, "onLocationChanged: $location")
+            val address = getAddress(location)
+            if (address.isNullOrEmpty()) {
+                trySend(location.mapper())
+            } else {
+                trySend(address[0].mapper())
             }
         }
 
@@ -51,11 +52,11 @@ class LocationRepository @Inject constructor(
             Logger.d(TAG, "getLastKnownLocation: $location")
             if (location == null) {
                 val result = gaoDeWeatherRemoteDataSource.getLocationByIp().mapper()
-                Logger.d(TAG, "get location from GaoDe: $result")
+                Logger.d(TAG, "get location By IP: $result")
                 trySend(result)
             } else {
                 val address = getAddress(location)
-                if (address == null || address.isEmpty()) {
+                if (address.isNullOrEmpty()) {
                     trySend(location.mapper())
                 } else {
                     trySend(address[0].mapper())
@@ -97,6 +98,31 @@ class LocationRepository @Inject constructor(
         } catch (e: Exception) {
             Logger.e(TAG, e.toString())
             null
+        }
+    }
+
+    override fun getLocationByGaoDe(): Flow<Location> = callbackFlow {
+        val listener = AMapLocationListener {
+            Logger.d(TAG, "AMapLocationListener onChange: $it")
+            it?.let {
+                trySend(it.mapper())
+            }
+        }
+        val locationOption = AMapLocationClientOption().apply {
+            locationMode = AMapLocationClientOption.AMapLocationMode.Hight_Accuracy
+            interval = 60 * 1000
+        }
+
+        val locationClient = AMapLocationClient(appContext).apply {
+            setLocationOption(locationOption)
+            setLocationListener(listener)
+        }
+
+        locationClient.startLocation()
+
+        awaitClose {
+            Logger.d(TAG, "awaitClose")
+            locationClient.stopLocation()
         }
     }
 

@@ -5,4 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface ILocationRepository {
     fun getLocation(): Flow<Location>
+    fun getLocationByGaoDe(): Flow<Location>
 }

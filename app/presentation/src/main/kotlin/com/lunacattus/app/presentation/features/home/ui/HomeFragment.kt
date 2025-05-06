@@ -49,6 +49,7 @@ class HomeFragment :
         PermissionX.init(this)
             .permissions(
                 Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
             )
             .explainReasonBeforeRequest()
             .onExplainRequestReason { scope, deniedList ->

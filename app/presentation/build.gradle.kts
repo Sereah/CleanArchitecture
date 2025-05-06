@@ -19,6 +19,16 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    //签名SHA1绑定了高德SDK
+    signingConfigs {
+        create("keystore") {
+            storeFile = file("../../keystore/debug.jks")
+            keyPassword = "123456"
+            storePassword = "123456"
+            keyAlias = "debug"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -26,6 +36,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.findByName("keystore")
+        }
+
+        debug {
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.findByName("keystore")
         }
     }
     compileOptions {
@@ -59,7 +75,7 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.tinypinyin.core)
     implementation(libs.tinypinyin.android)
-    implementation (libs.permissionx)
+    implementation(libs.permissionx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -19,6 +19,13 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    applicationVariants.all {
+        outputs.all {
+            (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl)
+                .outputFileName = "CleanArch.apk"
+        }
+    }
+
     //签名SHA1绑定了高德SDK
     signingConfigs {
         create("keystore") {
@@ -83,6 +90,4 @@ dependencies {
 
     implementation(project(":app:domain"))
     implementation(project(":app:data"))
-
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar", "*.aar"))))
 }

@@ -7,6 +7,15 @@ class WeatherViewModel {
     - getLocationUseCase: GetLocationUseCase
     - getWeatherGeoUseCase: GetWeatherGeoUseCase
     - requestWeatherUseCase: RequestWeatherUseCase
+    - queryNowWeatherUseCase: QueryNowWeatherUseCase
+    - queryDailyWeatherUseCase: QueryDailyWeatherUseCase
+    - queryHourlyWeatherUseCase: QueryHourlyWeatherUseCase
+    - getWeatherGeoListUseCase: GetWeatherGeoListUseCase
+    - getNowWeatherUseCase: GetNowWeatherUseCase
+    - getDailyWeatherUseCase: GetDailyWeatherUseCase
+    - getHourlyWeatherUseCase: GetHourlyWeatherUseCase
+    - saveWeatherUseCase: SaveWeatherUseCase
+    - queryAllWeatherUseCase: QueryAllWeatherUseCase
     + observeLocationChange(): Void
     - getWeatherGeo(lat: Double, lon: Double): WeatherGeo
     - requestWeather(id: String, isCurrentLocation: Boolean): Void
@@ -15,6 +24,15 @@ class WeatherViewModel {
 WeatherViewModel ..> GetLocationUseCase
 WeatherViewModel ..> GetWeatherGeoUseCase
 WeatherViewModel ..> RequestWeatherUseCase
+WeatherViewModel ..> QueryNowWeatherUseCase
+WeatherViewModel ..> QueryDailyWeatherUseCase
+WeatherViewModel ..> QueryHourlyWeatherUseCase
+WeatherViewModel ..> GetWeatherGeoListUseCase
+WeatherViewModel ..> GetNowWeatherUseCase
+WeatherViewModel ..> GetDailyWeatherUseCase
+WeatherViewModel ..> GetHourlyWeatherUseCase
+WeatherViewModel ..> SaveWeatherUseCase
+WeatherViewModel ..> QueryAllWeatherUseCase
 
 
 ' domain
@@ -25,7 +43,16 @@ interface ILocationRepository {
 
 interface IWeatherRepository {
     + getWeatherGeo(lat: Double, lon: Double): WeatherGeo
-    + requestWeather(id: Weather): Void
+    + requestWeather(id: String, isCurrentLocation: Boolean): Void
+    + queryNowWeather(id: String): Flow<NowWeather>
+    + queryDailyWeather(id: String): Flow<List<DailyWeather>>
+    + queryHourlyWeather(id: String): Flow<List<HourlyWeather>>
+    + getGeoList(keyword: String): List<WeatherGeo>
+    + getNowWeather(locationId: String): NowWeather
+    + getDailyWeather(locationId: String): List<DailyWeather>
+    + getHourlyWeather(locationId: String): List<HourlyWeather>
+    + saveWeather(weather: Weather): Void
+    + queryAllWeather(): Flow<List<Weather>>
 }
 
 class GetLocationUseCase {
@@ -43,9 +70,63 @@ class RequestWeatherUseCase {
     + invoke(id: String, isCurrentLocation: Boolean): Void
 }
 
+class QueryNowWeatherUseCase {
+    - repository: IWeatherRepository
+    + invoke(id: String): Flow<NowWeather>
+}
+
+class QueryDailyWeatherUseCase {
+    - repository: IWeatherRepository
+    + invoke(id: String): Flow<List<DailyWeather>>
+}
+
+class QueryHourlyWeatherUseCase {
+    - repository: IWeatherRepository
+    + invoke(id: String): Flow<List<HourlyWeather>>
+}
+
+class GetWeatherGeoListUseCase {
+    - repository: IWeatherRepository
+    + invoke(keyword: String): List<WeatherGeo>
+}
+
+class GetNowWeatherUseCase {
+    - repository: IWeatherRepository
+    + invoke(id: String): NowWeather
+}
+
+class GetDailyWeatherUseCase {
+    - repository: IWeatherRepository
+    + invoke(id: String): List<DailyWeather>
+}
+
+class GetHourlyWeatherUseCase {
+    - repository: IWeatherRepository
+    + invoke(id: String): List<HourlyWeather>
+}
+
+class SaveWeatherUseCase {
+    - repository: IWeatherRepository
+    + invoke(weather: Weather): Void
+}
+
+class QueryAllWeatherUseCase {
+    - repository: IWeatherRepository
+    + invoke(): Flow<List<Weather>>
+}
+
 GetWeatherGeoUseCase ..> IWeatherRepository
 RequestWeatherUseCase ..> IWeatherRepository
 GetLocationUseCase ..> ILocationRepository
+QueryNowWeatherUseCase ..> IWeatherRepository
+QueryDailyWeatherUseCase ..> IWeatherRepository
+QueryHourlyWeatherUseCase ..> IWeatherRepository
+GetWeatherGeoListUseCase ..> IWeatherRepository
+GetNowWeatherUseCase ..> IWeatherRepository
+GetDailyWeatherUseCase ..> IWeatherRepository
+GetHourlyWeatherUseCase ..> IWeatherRepository
+SaveWeatherUseCase ..> IWeatherRepository
+QueryAllWeatherUseCase ..> IWeatherRepository
 ILocationRepository <|.. LocationRepositroy
 IWeatherRepository <|.. WeatherRepository
 
@@ -63,6 +144,15 @@ class WeatherRepository {
     - weatherLocalDataSource: WeatherLocalDataSource
     + getWeatherGeo(lat: Double, lon: Double): WeatherGeo
     + requestWeather(id: String, isCurrentLocation: Boolean): Void
+    + queryNowWeather(id: String): Flow<NowWeather>
+    + queryDailyWeather(id: String): Flow<List<DailyWeather>>
+    + queryHourlyWeather(id: String): Flow<List<HourlyWeather>>
+    + getGeoList(keyword: String): List<WeatherGeo>
+    + getNowWeather(locationId: String): NowWeather
+    + getDailyWeather(locationId: String): List<DailyWeather>
+    + getHourlyWeather(locationId: String): List<HourlyWeather>
+    + saveWeather(weather: Weather): Void
+    + queryAllWeather(): Flow<List<Weather>>
 }
 
 class WeatherRemoteDataSource {
@@ -71,13 +161,19 @@ class WeatherRemoteDataSource {
     + getNowWeather(locationId: String): QWeatherNowDTO
     + getDailyWeather(locationId: String): QWeatherDailyDTO
     + getHourlyWeather(locationId: String): QWeatherHourlyDTO
+    + getGeoList(keyword: String): QWeatherGeoDTO
 }
 
 class WeatherLocalDataSource {
     - weatherDao: WeatherDao
+    + insertWeatherGeo(geo: QWeatherGeoEntity, isCurrentLocation: Boolean): Long
     + insertNowWeather(now: QWeatherNowEntity, isCurrentLocation: Boolean): Long
     + insertDailyWeather(daily: List<QWeatherDailyEntity>, isCurrentLocation: Boolean): List<Long>
     + insertHourlyWeather(hourly: List<QWeatherHourlyEntity>, isCurrentLocation: Boolean): List<Long>
+    + queryNowWeather(locationId: String): Flow<QWeatherNowEntity>
+    + queryDailyWeather(locationId: String): Flow<List<QWeatherDailyEntity>>
+    + queryHourlyWeather(locationId: String): Flow<List<QWeatherHourlyEntity>>
+    + queryAllWeather(): Flow<List<QWeatherEntity>>
 }
 
 interface QWeatherApi {
@@ -88,12 +184,18 @@ interface QWeatherApi {
 }
 
 interface WeatherDao {
-    + deleteOldLocationWeatherNow(): Long
+    + deleteOldLocationQWeatherGeo(): Long
+    + insertQWeatherGeo(geo: QWeatherGeoEntity): Long
+    + deleteOldLocationQWeatherNow(): Long
     + insertQWeatherNow(now: QWeatherNowEntity): Long
-    + deleteOldLocationWeatherDaily(): List<Long>
+    + deleteOldLocationQWeatherDaily(): List<Long>
     + insertQWeatherDaily(daily: List<QWeatherDailyEntity>): List<Long>
-    + deleteOldLocationWeatherHourly(): List<Long>
+    + deleteOldLocationQWeatherHourly(): List<Long>
     + insertQWeatherHourly(hourly: List<QWeatherHourlyEntity>): List<Long>
+    + queryQWeatherNow(locationId: String): Flow<QWeatherNowEntity>
+    + queryQWeatherDaily(locationId: String): Flow<List<QWeatherDailyEntity>>
+    + queryQWeatherHourly(locationId: String): Flow<List<QWeatherHourlyEntity>>
+    + queryQWeatherList(): Flow<List<QWeatherEntity>>
 }
 
 WeatherRepository ..> WeatherRemoteDataSource

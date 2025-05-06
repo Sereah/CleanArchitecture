@@ -12,8 +12,8 @@ import javax.inject.Singleton
 class QWeatherRemoteDataSource @Inject constructor(
     private val service: QWeatherService
 ) {
-    suspend fun getGeo(lat: Double, lon: Double): QWeatherGeoDTO {
-        return service.getGeo("$lat,$lon")
+    suspend fun getGeo(location: String): QWeatherGeoDTO {
+        return service.getGeo(location)
     }
 
     suspend fun getNowWeather(locationId: String): QWeatherNowDTO {

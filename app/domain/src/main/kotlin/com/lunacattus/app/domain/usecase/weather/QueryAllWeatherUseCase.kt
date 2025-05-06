@@ -7,10 +7,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class GetCurrentLocationWeatherUseCase @Inject constructor(
-    private val repository: IWeatherRepository
-) {
-    operator fun invoke(): Flow<Weather?> {
-        return repository.getCurrentWeather()
+class QueryAllWeatherUseCase @Inject constructor(private val repository: IWeatherRepository) {
+    operator fun invoke(): Result<Flow<List<Weather>>> {
+        return repository.queryAllWeather()
     }
 }

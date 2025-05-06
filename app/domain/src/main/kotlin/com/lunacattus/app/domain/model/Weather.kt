@@ -8,7 +8,7 @@ data class Weather(
     val geo: WeatherGeo,
     val nowWeather: NowWeather,
     val dailyWeather: List<DailyWeather>,
-    val hourlyWeather: List<HourlyWeather>
+    val hourlyWeather: List<HourlyWeather>,
 )
 
 data class WeatherGeo(
@@ -20,6 +20,7 @@ data class WeatherGeo(
     val province: String,
     val city: String,
     val timeZone: String,
+    val isCurrentLocation: Boolean,
 )
 
 data class NowWeather(
@@ -36,7 +37,8 @@ data class NowWeather(
     val pressure: Int = 0, //大气压强，默认单位：百帕
     val vis: Int = 0, //能见度，默认单位：公里
     val cloud: Int = 0, //云量，百分比数值。可能为空
-    val dew: Int = 0 //露点温度。可能为空
+    val dew: Int = 0, //露点温度。可能为空
+    val isCurrentLocation: Boolean = false,
 )
 
 data class DailyWeather(
@@ -63,6 +65,7 @@ data class DailyWeather(
     val pressure: Int, //大气压强，默认单位：百帕
     val vis: Int, //能见度，默认单位：公里
     val cloud: Int, //云量，百分比数值。可能为空
+    val isCurrentLocation: Boolean,
 )
 
 data class HourlyWeather(
@@ -78,7 +81,8 @@ data class HourlyWeather(
     val preCip: Float, //当前小时累计降水量，默认单位：毫米
     val pressure: Int, //大气压强，默认单位：百帕
     val cloud: Int, //云量，百分比数值。可能为空
-    val dew: Int //露点温度。可能为空
+    val dew: Int, //露点温度。可能为空
+    val isCurrentLocation: Boolean,
 )
 
 enum class WeatherText(

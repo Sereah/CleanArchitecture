@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "8e9030ab8cfd9e9051cfcb0f5b99927f",
+    "identityHash": "3007a82b93f4f04d55138c255d4cfd34",
     "entities": [
       {
         "tableName": "gao_de_live_weather",
@@ -186,7 +186,7 @@
         ]
       },
       {
-        "tableName": "q_weather_location",
+        "tableName": "q_weather_geo",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`locationId` TEXT NOT NULL, `name` TEXT NOT NULL, `lat` REAL NOT NULL, `lon` REAL NOT NULL, `country` TEXT NOT NULL, `province` TEXT NOT NULL, `city` TEXT NOT NULL, `timeZone` TEXT NOT NULL, `isCurrentLocation` INTEGER NOT NULL, PRIMARY KEY(`locationId`))",
         "fields": [
           {
@@ -253,7 +253,7 @@
       },
       {
         "tableName": "q_weather_now",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `locationId` TEXT NOT NULL, `obsTime` TEXT NOT NULL, `temp` INTEGER NOT NULL, `feelsTemp` INTEGER NOT NULL, `text` TEXT NOT NULL, `wind360` REAL NOT NULL, `windScale` TEXT NOT NULL, `windSpeed` INTEGER NOT NULL, `humidity` INTEGER NOT NULL, `preCip` REAL NOT NULL, `pressure` INTEGER NOT NULL, `vis` INTEGER NOT NULL, `cloud` INTEGER NOT NULL, `dew` INTEGER NOT NULL, FOREIGN KEY(`locationId`) REFERENCES `q_weather_location`(`locationId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `locationId` TEXT NOT NULL, `isCurrentLocation` INTEGER NOT NULL, `obsTime` TEXT NOT NULL, `temp` INTEGER NOT NULL, `feelsTemp` INTEGER NOT NULL, `text` TEXT NOT NULL, `wind360` REAL NOT NULL, `windScale` TEXT NOT NULL, `windSpeed` INTEGER NOT NULL, `humidity` INTEGER NOT NULL, `preCip` REAL NOT NULL, `pressure` INTEGER NOT NULL, `vis` INTEGER NOT NULL, `cloud` INTEGER NOT NULL, `dew` INTEGER NOT NULL, FOREIGN KEY(`locationId`) REFERENCES `q_weather_geo`(`locationId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -265,6 +265,12 @@
             "fieldPath": "locationId",
             "columnName": "locationId",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isCurrentLocation",
+            "columnName": "isCurrentLocation",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -354,7 +360,7 @@
         },
         "foreignKeys": [
           {
-            "table": "q_weather_location",
+            "table": "q_weather_geo",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
@@ -368,7 +374,7 @@
       },
       {
         "tableName": "q_weather_daily",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `locationId` TEXT NOT NULL, `fxDate` TEXT NOT NULL, `sunrise` TEXT NOT NULL, `sunset` TEXT NOT NULL, `moonrise` TEXT NOT NULL, `moonSet` TEXT NOT NULL, `moonPhase` TEXT NOT NULL, `tempMax` INTEGER NOT NULL, `tempMin` INTEGER NOT NULL, `textDay` TEXT NOT NULL, `textNight` TEXT NOT NULL, `wind360Day` REAL NOT NULL, `windScaleDay` TEXT NOT NULL, `windSpeedDay` INTEGER NOT NULL, `wind360Night` REAL NOT NULL, `windScaleNight` TEXT NOT NULL, `windSpeedNight` INTEGER NOT NULL, `humidity` INTEGER NOT NULL, `preCip` REAL NOT NULL, `pressure` INTEGER NOT NULL, `vis` INTEGER NOT NULL, `cloud` INTEGER NOT NULL, `uvIndex` INTEGER NOT NULL, FOREIGN KEY(`locationId`) REFERENCES `q_weather_location`(`locationId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `locationId` TEXT NOT NULL, `isCurrentLocation` INTEGER NOT NULL, `fxDate` TEXT NOT NULL, `sunrise` TEXT NOT NULL, `sunset` TEXT NOT NULL, `moonrise` TEXT NOT NULL, `moonSet` TEXT NOT NULL, `moonPhase` TEXT NOT NULL, `tempMax` INTEGER NOT NULL, `tempMin` INTEGER NOT NULL, `textDay` TEXT NOT NULL, `textNight` TEXT NOT NULL, `wind360Day` REAL NOT NULL, `windScaleDay` TEXT NOT NULL, `windSpeedDay` INTEGER NOT NULL, `wind360Night` REAL NOT NULL, `windScaleNight` TEXT NOT NULL, `windSpeedNight` INTEGER NOT NULL, `humidity` INTEGER NOT NULL, `preCip` REAL NOT NULL, `pressure` INTEGER NOT NULL, `vis` INTEGER NOT NULL, `cloud` INTEGER NOT NULL, `uvIndex` INTEGER NOT NULL, FOREIGN KEY(`locationId`) REFERENCES `q_weather_geo`(`locationId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -380,6 +386,12 @@
             "fieldPath": "locationId",
             "columnName": "locationId",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isCurrentLocation",
+            "columnName": "isCurrentLocation",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -523,7 +535,7 @@
         },
         "foreignKeys": [
           {
-            "table": "q_weather_location",
+            "table": "q_weather_geo",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
@@ -537,7 +549,7 @@
       },
       {
         "tableName": "q_weather_hourly",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `locationId` TEXT NOT NULL, `fxTime` TEXT NOT NULL, `temp` INTEGER NOT NULL, `text` TEXT NOT NULL, `wind360` REAL NOT NULL, `windScale` TEXT NOT NULL, `windSpeed` INTEGER NOT NULL, `humidity` INTEGER NOT NULL, `pop` INTEGER NOT NULL, `preCip` REAL NOT NULL, `pressure` INTEGER NOT NULL, `cloud` INTEGER NOT NULL, `dew` INTEGER NOT NULL, FOREIGN KEY(`locationId`) REFERENCES `q_weather_location`(`locationId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `locationId` TEXT NOT NULL, `isCurrentLocation` INTEGER NOT NULL, `fxTime` TEXT NOT NULL, `temp` INTEGER NOT NULL, `text` TEXT NOT NULL, `wind360` REAL NOT NULL, `windScale` TEXT NOT NULL, `windSpeed` INTEGER NOT NULL, `humidity` INTEGER NOT NULL, `pop` INTEGER NOT NULL, `preCip` REAL NOT NULL, `pressure` INTEGER NOT NULL, `cloud` INTEGER NOT NULL, `dew` INTEGER NOT NULL, FOREIGN KEY(`locationId`) REFERENCES `q_weather_geo`(`locationId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -549,6 +561,12 @@
             "fieldPath": "locationId",
             "columnName": "locationId",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isCurrentLocation",
+            "columnName": "isCurrentLocation",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -632,7 +650,7 @@
         },
         "foreignKeys": [
           {
-            "table": "q_weather_location",
+            "table": "q_weather_geo",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
@@ -647,7 +665,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8e9030ab8cfd9e9051cfcb0f5b99927f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3007a82b93f4f04d55138c255d4cfd34')"
     ]
   }
 }

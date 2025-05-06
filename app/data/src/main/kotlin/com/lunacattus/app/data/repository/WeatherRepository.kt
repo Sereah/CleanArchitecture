@@ -4,9 +4,12 @@ import com.lunacattus.app.data.local.datasource.WeatherLocalDataSource
 import com.lunacattus.app.data.mapper.WeatherMapper.mapperToEntity
 import com.lunacattus.app.data.mapper.WeatherMapper.mapperToModel
 import com.lunacattus.app.data.remote.datasource.QWeatherRemoteDataSource
+import com.lunacattus.app.domain.model.DailyWeather
+import com.lunacattus.app.domain.model.HourlyWeather
+import com.lunacattus.app.domain.model.NowWeather
 import com.lunacattus.app.domain.model.Weather
+import com.lunacattus.app.domain.model.WeatherGeo
 import com.lunacattus.app.domain.repository.weather.IWeatherRepository
-import com.lunacattus.clean.common.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -23,83 +26,136 @@ class WeatherRepository @Inject constructor(
     private val qWeatherRemoteDataSource: QWeatherRemoteDataSource,
 ) : IWeatherRepository {
 
-    override suspend fun requestAllWeatherInfo(locationId: String): Result<Unit> {
-        return try {
-            withContext(Dispatchers.IO) {
-                supervisorScope {
-                    val nowJob = launch {
-                        val nowResponse =
-                            qWeatherRemoteDataSource.getNowWeather(locationId)
-                        if (nowResponse.code == Q_WEATHER_SUCCESS) {
-                            weatherLocalDataSource.insertQWeatherNow(
-                                nowResponse.mapperToEntity(locationId)
-                            )
-                        }
-                    }
-                    val dailyJob = launch {
-                        val dailyResponse =
-                            qWeatherRemoteDataSource.getDailyWeather(locationId)
-                        if (dailyResponse.code == Q_WEATHER_SUCCESS && dailyResponse.daily.isNotEmpty()) {
-                            weatherLocalDataSource.insertQWeatherDaily(
-                                dailyResponse.mapperToEntity(locationId)
-                            )
-                        }
-                    }
-                    val hourlyJob = launch {
-                        val hourlyResponse =
-                            qWeatherRemoteDataSource.getHourlyWeather(locationId)
-                        if (hourlyResponse.code == Q_WEATHER_SUCCESS && hourlyResponse.hourly.isNotEmpty()) {
-                            weatherLocalDataSource.insertQWeatherHourly(
-                                hourlyResponse.mapperToEntity(locationId)
-                            )
-                        }
-                    }
-                    joinAll(nowJob, dailyJob, hourlyJob)
-                }
-                Result.success(Unit)
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    override fun getCurrentWeather(): Flow<Weather?> {
-        return weatherLocalDataSource.getCurrentLocationWeather().map {
-            it?.mapperToModel()
-        }
-    }
-
-    override suspend fun requestNowWeatherInfo(locationId: String): Result<Unit> {
-        return try {
-            withContext(Dispatchers.IO) {
-                val response = qWeatherRemoteDataSource.getNowWeather(locationId)
-                if (response.code != Q_WEATHER_SUCCESS) {
-                    throw Exception("request now weather fail")
-                }
-                val result = weatherLocalDataSource.insertQWeatherNow(response.mapperToEntity(locationId))
-                Logger.d(TAG, "insertQWeatherNow, result: $result")
-                Result.success(Unit)
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    override suspend fun getWeatherGeographicId(
-        latitude: Double,
-        longitude: Double,
+    override suspend fun requestAndSaveWeather(
+        location: String,
         isCurrentLocation: Boolean
-    ): Result<String> {
+    ): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val geo = qWeatherRemoteDataSource.getGeo(location)
+            if (geo.code != Q_WEATHER_SUCCESS) {
+                throw Exception("request geographic info fail.")
+            }
+            if (geo.location.isEmpty()) {
+                throw Exception("request geographic null.")
+            }
+            weatherLocalDataSource.insertWeatherGeo(geo.mapperToEntity(isCurrentLocation)[0])
+            val id = geo.location[0].id
+            supervisorScope {
+                val nowJob = launch {
+                    val now = qWeatherRemoteDataSource.getNowWeather(id)
+                    if (now.code == Q_WEATHER_SUCCESS) {
+                        weatherLocalDataSource.insertNowWeather(
+                            now.mapperToEntity(id, isCurrentLocation)
+                        )
+                    }
+                }
+                val dailyJob = launch {
+                    val daily = qWeatherRemoteDataSource.getDailyWeather(id)
+                    if (daily.code == Q_WEATHER_SUCCESS && daily.daily.isNotEmpty()) {
+                        weatherLocalDataSource.insertDailyWeather(
+                            daily.mapperToEntity(id, isCurrentLocation)
+                        )
+                    }
+                }
+                val hourlyJob = launch {
+                    val hourly = qWeatherRemoteDataSource.getHourlyWeather(id)
+                    if (hourly.code == Q_WEATHER_SUCCESS && hourly.hourly.isNotEmpty()) {
+                        weatherLocalDataSource.insertHourlyWeather(
+                            hourly.mapperToEntity(id, isCurrentLocation)
+                        )
+                    }
+                }
+                joinAll(nowJob, dailyJob, hourlyJob)
+            }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override fun queryNowWeather(id: String): Result<Flow<NowWeather>> {
         return try {
-            withContext(Dispatchers.IO) {
-                val geo = qWeatherRemoteDataSource.getGeo(latitude, longitude)
-                Logger.d(TAG, "getGeo: $geo")
-                if (geo.code != Q_WEATHER_SUCCESS || geo.location.isEmpty()) {
+            val query = weatherLocalDataSource.queryNowWeather(id)
+            Result.success(query.map { it.mapperToModel() })
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override fun queryDailyWeather(id: String): Result<Flow<List<DailyWeather>>> {
+        return try {
+            val query = weatherLocalDataSource.queryDailyWeather(id)
+            Result.success(query.map { it.map { it.mapperToModel() } })
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override fun queryHourlyWeather(id: String): Result<Flow<List<HourlyWeather>>> {
+        return try {
+            val query = weatherLocalDataSource.queryHourlyWeather(id)
+            Result.success(query.map { it.map { it.mapperToModel() } })
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getGeoList(keyword: String): Result<List<WeatherGeo>> =
+        withContext(Dispatchers.IO) {
+            try {
+                val geo = qWeatherRemoteDataSource.getGeo(keyword)
+                if (geo.code != Q_WEATHER_SUCCESS) {
                     throw Exception("request geographic info fail.")
                 }
-                weatherLocalDataSource.insertQWeatherLocation(geo.mapperToEntity(isCurrentLocation))
-                Result.success(geo.location[0].id)
+                Result.success(geo.mapperToModel(false))
+            } catch (e: Exception) {
+                Result.failure(e)
             }
+        }
+
+    override suspend fun getNowWeather(locationId: String): Result<NowWeather> =
+        withContext(Dispatchers.IO) {
+            try {
+                val now = qWeatherRemoteDataSource.getNowWeather(locationId)
+                if (now.code != Q_WEATHER_SUCCESS) {
+                    throw Exception("request now weather info fail.")
+                }
+                Result.success(now.mapperToModel(locationId, false))
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+
+    override suspend fun getDailyWeather(locationId: String): Result<List<DailyWeather>> =
+        withContext(Dispatchers.IO) {
+            try {
+                val daily = qWeatherRemoteDataSource.getDailyWeather(locationId)
+                if (daily.code != Q_WEATHER_SUCCESS) {
+                    throw Exception("request daily weather info fail.")
+                }
+                Result.success(daily.mapperToModel(locationId, false))
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+
+    override suspend fun getHourlyWeather(locationId: String): Result<List<HourlyWeather>> =
+        withContext(Dispatchers.IO) {
+            try {
+                val hourly = qWeatherRemoteDataSource.getHourlyWeather(locationId)
+                if (hourly.code != Q_WEATHER_SUCCESS) {
+                    throw Exception("request hourly weather info fail.")
+                }
+                Result.success(hourly.mapperToModel(locationId, false))
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+
+    override fun queryAllWeather(): Result<Flow<List<Weather>>> {
+        return try {
+            val query = weatherLocalDataSource.queryAllWeather()
+            Result.success(query.map { it.map { it.mapperToModel() } })
         } catch (e: Exception) {
             Result.failure(e)
         }

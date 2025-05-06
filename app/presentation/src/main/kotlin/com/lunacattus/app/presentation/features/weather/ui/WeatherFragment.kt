@@ -1,8 +1,8 @@
 package com.lunacattus.app.presentation.features.weather.ui
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
-import com.lunacattus.app.domain.model.HourlyWeather
 import com.lunacattus.app.presentation.common.ui.base.BaseFragment
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherSideEffect
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiIntent
@@ -26,7 +26,7 @@ class WeatherFragment :
 
     override fun setupObservers() {
         collectState<WeatherUiState.Loading> {
-            Logger.d(TAG, "Loading---")
+            Logger.d(TAG, "Loading----")
         }
 
         collectState<WeatherUiState.Success.Now>(
@@ -54,7 +54,11 @@ class WeatherFragment :
     }
 
     override fun handleSideEffect(effect: WeatherSideEffect) {
-
+        when(effect) {
+            is WeatherSideEffect.ShowFailToast -> {
+                Toast.makeText(requireContext(), effect.msg, Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     override fun onStop() {

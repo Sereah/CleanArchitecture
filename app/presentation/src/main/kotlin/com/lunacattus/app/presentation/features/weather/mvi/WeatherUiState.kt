@@ -9,7 +9,6 @@ import com.lunacattus.app.presentation.common.ui.base.IUiState
 sealed interface WeatherUiState : IUiState {
     object Initial : WeatherUiState
     object Loading : WeatherUiState
-    data class Error(val msg: String) : WeatherUiState
 
     sealed interface Success : WeatherUiState {
         data class Geo(val geo: WeatherGeo) : Success
@@ -17,4 +16,6 @@ sealed interface WeatherUiState : IUiState {
         data class Daily(val daily: List<DailyWeather>) : Success
         data class Hourly(val hourly: List<HourlyWeather>) : Success
     }
+
+    data class Error(val msg: String) : WeatherUiState
 }

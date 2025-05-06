@@ -2,11 +2,12 @@ package com.lunacattus.app.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 
-data class GaoDeIpInfoDTO(
+data class GaoDeLocationInfoDTO(
     val status: Int,
     val info: String,
     @SerializedName("infocode") val infoCode: Int,
     @SerializedName("adcode") val adCode: Any,
+    val rectangle: Any,
 )
 
 data class GaoDeLiveWeatherDTO(

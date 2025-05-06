@@ -5,7 +5,7 @@ import com.lunacattus.app.domain.repository.location.ILocationRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class RequestLocationUseCase @Inject constructor(
+class GetLocationUseCase @Inject constructor(
     private val repository: ILocationRepository
 ) {
     operator fun invoke(): Flow<Location> {

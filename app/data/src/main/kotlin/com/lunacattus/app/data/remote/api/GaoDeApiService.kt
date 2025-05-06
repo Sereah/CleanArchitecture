@@ -1,7 +1,7 @@
 package com.lunacattus.app.data.remote.api
 
 import com.lunacattus.app.data.remote.dto.GaoDeDailyWeatherDTO
-import com.lunacattus.app.data.remote.dto.GaoDeIpInfoDTO
+import com.lunacattus.app.data.remote.dto.GaoDeLocationInfoDTO
 import com.lunacattus.app.data.remote.dto.GaoDeLiveWeatherDTO
 import com.lunacattus.app.data.remote.dto.GaoDeSearchCityDTO
 import com.lunacattus.data.BuildConfig
@@ -21,7 +21,7 @@ interface GaoDeApiService {
     ): GaoDeDailyWeatherDTO
 
     @GET("v3/ip?key=${BuildConfig.gaoDeApi}")
-    suspend fun getCurrentAdCodeByIp(): GaoDeIpInfoDTO
+    suspend fun getLocationByIp(): GaoDeLocationInfoDTO
 
     @GET("v3/place/text?key=${BuildConfig.gaoDeApi}&types=190100&children=1&offset=20&page=1&extensions=all")
     suspend fun searchCityAdCode(

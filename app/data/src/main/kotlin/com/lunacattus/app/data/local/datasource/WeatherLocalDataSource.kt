@@ -1,14 +1,11 @@
 package com.lunacattus.app.data.local.datasource
 
 import com.lunacattus.app.data.local.api.WeatherDao
-import com.lunacattus.app.data.local.entity.GaoDeDailyWeatherEntity
 import com.lunacattus.app.data.local.entity.QWeatherDailyEntity
+import com.lunacattus.app.data.local.entity.QWeatherEntity
+import com.lunacattus.app.data.local.entity.QWeatherGeoEntity
 import com.lunacattus.app.data.local.entity.QWeatherHourlyEntity
-import com.lunacattus.app.data.local.entity.QWeatherLocationEntity
 import com.lunacattus.app.data.local.entity.QWeatherNowEntity
-import com.lunacattus.app.data.local.entity.GaoDeLiveWeatherEntity
-import com.lunacattus.app.data.local.entity.GaoDeWeatherWithDailyWeather
-import com.lunacattus.app.data.local.entity.QWeatherCombinedData
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,42 +14,47 @@ import javax.inject.Singleton
 class WeatherLocalDataSource @Inject constructor(
     private val weatherDao: WeatherDao
 ) {
-    suspend fun insertGaoDeLiveWeather(weatherEntity: GaoDeLiveWeatherEntity): Long {
-        return weatherDao.insertGaoDeLiveWeather(weatherEntity)
+    suspend fun insertWeatherGeo(geo: QWeatherGeoEntity) {
+        if (geo.isCurrentLocation) {
+            weatherDao.deleteOldLocationQWeatherGeo()
+        }
+        weatherDao.insertQWeatherGeo(geo)
     }
 
-    suspend fun insertGaoDeDailyWeather(
-        adCode: String,
-        dailyWeathers: List<GaoDeDailyWeatherEntity>
-    ): List<Long> {
-        weatherDao.clearGaoDeDailyWeather(adCode.toInt())
-        return weatherDao.insertGaoDeDailyWeather(dailyWeathers)
+    suspend fun insertNowWeather(now: QWeatherNowEntity) {
+        if (now.isCurrentLocation) {
+            weatherDao.deleteOldLocationQWeatherNow()
+        }
+        weatherDao.insertQWeatherNow(now)
     }
 
-    fun getGaoDeWeatherWithDailyWeather(): Flow<GaoDeWeatherWithDailyWeather?> {
-        return weatherDao.getGaoDeLastWeatherWithDailyWeather()
+    suspend fun insertDailyWeather(daily: List<QWeatherDailyEntity>) {
+        if (daily.isNotEmpty() && daily[0].isCurrentLocation) {
+            weatherDao.deleteOldLocationQWeatherDaily()
+        }
+        weatherDao.insertQWeatherDaily(daily)
     }
 
-    suspend fun insertQWeatherLocation(weatherLocation: QWeatherLocationEntity): Long {
-        return weatherDao.insertQWeatherLocation(weatherLocation)
+    suspend fun insertHourlyWeather(hourly: List<QWeatherHourlyEntity>) {
+        if (hourly.isNotEmpty() && hourly[0].isCurrentLocation) {
+            weatherDao.deleteOldLocationQWeatherHourly()
+        }
+        weatherDao.insertQWeatherHourly(hourly)
     }
 
-    suspend fun insertQWeatherNow(weatherNow: QWeatherNowEntity): Long {
-        weatherDao.clearQWeatherNow(weatherNow.locationId)
-        return weatherDao.insertQWeatherNow(weatherNow)
+    fun queryNowWeather(locationId: String): Flow<QWeatherNowEntity> {
+        return weatherDao.queryQWeatherNow(locationId)
     }
 
-    suspend fun insertQWeatherDaily(weatherDaily: List<QWeatherDailyEntity>): List<Long> {
-        weatherDao.clearQWeatherDaily(weatherDaily[0].locationId)
-        return weatherDao.insertQWeatherDaily(weatherDaily)
+    fun queryDailyWeather(locationId: String): Flow<List<QWeatherDailyEntity>> {
+        return weatherDao.queryQWeatherDaily(locationId)
     }
 
-    suspend fun insertQWeatherHourly(weatherHourly: List<QWeatherHourlyEntity>): List<Long> {
-        weatherDao.clearQWeatherHourly(weatherHourly[0].locationId)
-        return weatherDao.insertQWeatherHourly(weatherHourly)
+    fun queryHourlyWeather(locationId: String): Flow<List<QWeatherHourlyEntity>> {
+        return weatherDao.queryQWeatherHourly(locationId)
     }
 
-    fun getCurrentLocationWeather(): Flow<QWeatherCombinedData?> {
-        return weatherDao.getCurrentLocationWeather()
+    fun queryAllWeather(): Flow<List<QWeatherEntity>> {
+        return weatherDao.queryAllQWeather()
     }
 }

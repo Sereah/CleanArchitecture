@@ -2,7 +2,7 @@ package com.lunacattus.app.data.remote.datasource
 
 import com.lunacattus.app.data.remote.api.GaoDeApiService
 import com.lunacattus.app.data.remote.dto.GaoDeDailyWeatherDTO
-import com.lunacattus.app.data.remote.dto.GaoDeIpInfoDTO
+import com.lunacattus.app.data.remote.dto.GaoDeLocationInfoDTO
 import com.lunacattus.app.data.remote.dto.GaoDeLiveWeatherDTO
 import com.lunacattus.app.data.remote.dto.GaoDeSearchCityDTO
 import javax.inject.Inject
@@ -21,8 +21,8 @@ class GaoDeWeatherRemoteDataSource @Inject constructor(
         return service.getDailyWeather(cityCode)
     }
 
-    suspend fun getCurrentAdCode(): GaoDeIpInfoDTO {
-        return service.getCurrentAdCodeByIp()
+    suspend fun getLocationByIp(): GaoDeLocationInfoDTO {
+        return service.getLocationByIp()
     }
 
     suspend fun searchCity(keyword: String): GaoDeSearchCityDTO {

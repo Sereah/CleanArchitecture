@@ -6,8 +6,8 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 
-@Entity(tableName = "q_weather_location")
-data class QWeatherLocationEntity(
+@Entity(tableName = "q_weather_geo")
+data class QWeatherGeoEntity(
     @PrimaryKey val locationId: String,
     val name: String,
     val lat: Double,
@@ -23,7 +23,7 @@ data class QWeatherLocationEntity(
     tableName = "q_weather_now",
     foreignKeys = [
         ForeignKey(
-            entity = QWeatherLocationEntity::class,
+            entity = QWeatherGeoEntity::class,
             parentColumns = ["locationId"],
             childColumns = ["locationId"],
             onDelete = ForeignKey.CASCADE
@@ -33,6 +33,7 @@ data class QWeatherLocationEntity(
 data class QWeatherNowEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val locationId: String,
+    val isCurrentLocation: Boolean,
     val obsTime: String,
     val temp: Int,
     val feelsTemp: Int,
@@ -52,7 +53,7 @@ data class QWeatherNowEntity(
     tableName = "q_weather_daily",
     foreignKeys = [
         ForeignKey(
-            entity = QWeatherLocationEntity::class,
+            entity = QWeatherGeoEntity::class,
             parentColumns = ["locationId"],
             childColumns = ["locationId"],
             onDelete = ForeignKey.CASCADE
@@ -62,6 +63,7 @@ data class QWeatherNowEntity(
 data class QWeatherDailyEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val locationId: String,
+    val isCurrentLocation: Boolean,
     val fxDate: String,
     val sunrise: String,
     val sunset: String,
@@ -90,7 +92,7 @@ data class QWeatherDailyEntity(
     tableName = "q_weather_hourly",
     foreignKeys = [
         ForeignKey(
-            entity = QWeatherLocationEntity::class,
+            entity = QWeatherGeoEntity::class,
             parentColumns = ["locationId"],
             childColumns = ["locationId"],
             onDelete = ForeignKey.CASCADE
@@ -100,6 +102,7 @@ data class QWeatherDailyEntity(
 data class QWeatherHourlyEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val locationId: String,
+    val isCurrentLocation: Boolean,
     val fxTime: String,
     val temp: Int,
     val text: String,
@@ -114,8 +117,8 @@ data class QWeatherHourlyEntity(
     val dew: Int
 )
 
-data class QWeatherCombinedData(
-    @Embedded val location: QWeatherLocationEntity,
+data class QWeatherEntity(
+    @Embedded val geo: QWeatherGeoEntity,
     @Relation(
         parentColumn = "locationId",
         entityColumn = "locationId",

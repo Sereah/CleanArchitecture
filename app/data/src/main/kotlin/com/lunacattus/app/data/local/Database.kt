@@ -6,7 +6,7 @@ import com.lunacattus.app.data.local.api.WeatherDao
 import com.lunacattus.app.data.local.entity.GaoDeDailyWeatherEntity
 import com.lunacattus.app.data.local.entity.QWeatherDailyEntity
 import com.lunacattus.app.data.local.entity.QWeatherHourlyEntity
-import com.lunacattus.app.data.local.entity.QWeatherLocationEntity
+import com.lunacattus.app.data.local.entity.QWeatherGeoEntity
 import com.lunacattus.app.data.local.entity.QWeatherNowEntity
 import com.lunacattus.app.data.local.entity.GaoDeLiveWeatherEntity
 
@@ -14,7 +14,7 @@ import com.lunacattus.app.data.local.entity.GaoDeLiveWeatherEntity
     entities = [
         GaoDeLiveWeatherEntity::class,
         GaoDeDailyWeatherEntity::class,
-        QWeatherLocationEntity::class,
+        QWeatherGeoEntity::class,
         QWeatherNowEntity::class,
         QWeatherDailyEntity::class,
         QWeatherHourlyEntity::class,

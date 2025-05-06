@@ -3,10 +3,12 @@ package com.lunacattus.app.data.repository
 import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Address
+import android.location.Criteria
 import android.location.Geocoder
 import android.location.LocationListener
 import android.location.LocationManager
 import com.lunacattus.app.data.mapper.LocationMapper.mapper
+import com.lunacattus.app.data.remote.datasource.GaoDeWeatherRemoteDataSource
 import com.lunacattus.app.domain.model.Location
 import com.lunacattus.app.domain.repository.location.ILocationRepository
 import com.lunacattus.clean.common.Logger
@@ -20,7 +22,8 @@ import javax.inject.Singleton
 @Singleton
 class LocationRepository @Inject constructor(
     private val locationManager: LocationManager,
-    private val appContext: Context
+    private val appContext: Context,
+    private val gaoDeWeatherRemoteDataSource: GaoDeWeatherRemoteDataSource
 ) : ILocationRepository {
 
     @SuppressLint("MissingPermission")
@@ -38,6 +41,7 @@ class LocationRepository @Inject constructor(
         }
 
         listOf(
+            LocationManager.FUSED_PROVIDER,
             LocationManager.GPS_PROVIDER,
             LocationManager.NETWORK_PROVIDER,
             LocationManager.PASSIVE_PROVIDER,
@@ -45,22 +49,40 @@ class LocationRepository @Inject constructor(
             locationManager.getLastKnownLocation(it)
         }.let { location ->
             Logger.d(TAG, "getLastKnownLocation: $location")
-            location?.let {
-                val address = getAddress(it)
+            if (location == null) {
+                val result = gaoDeWeatherRemoteDataSource.getLocationByIp().mapper()
+                Logger.d(TAG, "get location from GaoDe: $result")
+                trySend(result)
+            } else {
+                val address = getAddress(location)
                 if (address == null || address.isEmpty()) {
-                    trySend(it.mapper())
+                    trySend(location.mapper())
                 } else {
                     trySend(address[0].mapper())
                 }
             }
         }
 
-        locationManager.requestLocationUpdates(
-            LocationManager.GPS_PROVIDER,
-            5000,
-            10f,
-            callback
-        )
+        val criteria = Criteria().apply {
+            accuracy = Criteria.ACCURACY_FINE
+        }
+        val provider = locationManager.getBestProvider(criteria, true)
+        Logger.d(TAG, "getBestProvider: $provider")
+        if (provider != null && locationManager.isProviderEnabled(provider)) {
+            locationManager.requestLocationUpdates(
+                provider,
+                5000,
+                10f,
+                callback
+            )
+        } else {
+            locationManager.requestLocationUpdates(
+                LocationManager.NETWORK_PROVIDER,
+                5000,
+                10f,
+                callback
+            )
+        }
 
         awaitClose {
             Logger.d(TAG, "awaitClose")

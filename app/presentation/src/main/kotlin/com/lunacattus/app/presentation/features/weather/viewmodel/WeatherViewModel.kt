@@ -70,9 +70,12 @@ class WeatherViewModel @Inject constructor(
 
     private fun observeAllWeather() {
         viewModelScope.launch {
-            queryAllWeatherUseCase.invoke().onSuccess {
-                it.filter { it.isNotEmpty() }.distinctUntilChanged().collect {
-                    Logger.d(TAG, "query all weather: ${it.size}")
+            queryAllWeatherUseCase.invoke().onSuccess { flow ->
+                flow.filter { it.isNotEmpty() }.distinctUntilChanged().collect { weather ->
+                    Logger.d(TAG, "query all weather: ${weather.size}")
+                    updateUiState {
+                        WeatherUiState.Success.WeatherList(weather)
+                    }
                 }
             }.onFailure {
                 sendSideEffect(WeatherSideEffect.ShowFailToast(msg = it.localizedMessage ?: ""))

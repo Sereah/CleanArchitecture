@@ -1,7 +1,9 @@
 package com.lunacattus.app.presentation.features.home.ui
 
 import android.Manifest
+import android.content.res.Configuration
 import android.os.Bundle
+import android.view.WindowInsetsController
 import androidx.fragment.app.viewModels
 import com.lunacattus.app.presentation.common.navigation.NavCommand
 import com.lunacattus.app.presentation.common.navigation.NavCommand.Companion.defaultNavDirection
@@ -10,6 +12,7 @@ import com.lunacattus.app.presentation.features.home.mvi.HomeSideEffect
 import com.lunacattus.app.presentation.features.home.mvi.HomeUiIntent
 import com.lunacattus.app.presentation.features.home.mvi.HomeUiState
 import com.lunacattus.app.presentation.features.home.viewmodel.HomeViewModel
+import com.lunacattus.clean.common.Logger
 import com.lunacattus.clean.presentation.R
 import com.lunacattus.clean.presentation.databinding.FragmentHomeBinding
 import com.permissionx.guolindev.PermissionX
@@ -24,6 +27,8 @@ class HomeFragment :
     override val viewModel: HomeViewModel by viewModels()
 
     override fun setupViews(savedInstanceState: Bundle?) {
+        Logger.d(TAG, "onViewCreated")
+        setStatusBarColor()
         binding.btnFeatureChat.setOnClickListener {
             checkLocationPermission()
         }
@@ -68,11 +73,32 @@ class HomeFragment :
                     getString(R.string.cancel)
                 )
             }
-            .request { allGranted, grantedList, deniedList ->
+            .request { allGranted, _, _ ->
                 if (allGranted) {
                     dispatchUiIntent(HomeUiIntent.OnFeatureChatRequested)
                 }
             }
+    }
+
+    private fun setStatusBarColor() {
+        val isNightMode =
+            requireActivity().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+        Logger.d(TAG, "isNightMode: $isNightMode")
+        if (isNightMode) {
+            requireActivity().window.insetsController?.apply {
+                setSystemBarsAppearance(
+                    0,
+                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                )
+            }
+        } else {
+            requireActivity().window.insetsController?.apply {
+                setSystemBarsAppearance(
+                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                )
+            }
+        }
     }
 
     companion object {

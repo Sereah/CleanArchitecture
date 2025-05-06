@@ -1,9 +1,5 @@
 package com.lunacattus.app.domain.model
 
-import com.lunacattus.app.domain.model.WeatherText.entries
-import com.lunacattus.app.domain.model.WindDirection.entries
-import com.lunacattus.app.domain.model.WindScale.entries
-
 data class Weather(
     val geo: WeatherGeo,
     val nowWeather: NowWeather,

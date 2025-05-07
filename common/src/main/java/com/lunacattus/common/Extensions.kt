@@ -8,6 +8,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
+import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -16,6 +18,8 @@ import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+import java.time.format.TextStyle
+import java.util.Locale
 import kotlin.math.roundToInt
 
 /**
@@ -82,6 +86,7 @@ fun String.parseToTimestamp(): Long {
 
 /**
  * 将时间戳（Long）转换为指定格式的日期时间字符串
+ * 如果时间戳是三天内，则只输出小时（HH）
  * @param format 目标格式（默认 "yyyy-MM-dd HH:mm:ss"）
  */
 fun Long.toFormattedDateTime(format: String = "yyyy-MM-dd HH:mm:ss"): String {
@@ -99,6 +104,25 @@ fun Long.toIso8601DateTime(): String {
     return Instant.ofEpochMilli(this)
         .atZone(ZoneId.systemDefault())
         .format(formatter)
+}
+
+/**
+ * 将时间戳（Long）转换为星期几的中文表示
+ */
+fun Long.toChineseDayOfWeek(): String {
+    val instant = Instant.ofEpochMilli(this)
+    val zonedDateTime = instant.atZone(ZoneId.systemDefault())
+    val dayOfWeek = zonedDateTime.dayOfWeek
+
+    return when (dayOfWeek) {
+        DayOfWeek.MONDAY -> "周一"
+        DayOfWeek.TUESDAY -> "周二"
+        DayOfWeek.WEDNESDAY -> "周三"
+        DayOfWeek.THURSDAY -> "周四"
+        DayOfWeek.FRIDAY -> "周五"
+        DayOfWeek.SATURDAY -> "周六"
+        DayOfWeek.SUNDAY -> "周日"
+    }
 }
 
 /**

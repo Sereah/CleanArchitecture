@@ -10,7 +10,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.lunacattus.clean.presentation"
+        applicationId = "com.lunacattus.clean.app"
         minSdk = 31
         targetSdk = 35
         versionCode = 1

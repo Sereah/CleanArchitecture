@@ -24,12 +24,7 @@ class CityOptionFragment :
             navCoordinator().execute(NavCommand.Back)
         }
         binding.searchView.setOnClickListener {
-            navCoordinator().execute(
-                NavCommand.ToDirection(
-                    NavCommand.defaultNavDirection(R.id.action_city_to_search),
-                    options = null
-                )
-            )
+
         }
     }
 

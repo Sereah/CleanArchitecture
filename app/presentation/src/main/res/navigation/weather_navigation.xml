@@ -3,31 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/weather_navigation"
-    app:startDestination="@id/weather_dest">
+    app:startDestination="@id/weatherPager_dest">
+
+    <fragment
+        android:id="@+id/weatherPager_dest"
+        android:name="com.lunacattus.app.presentation.features.weather.ui.WeatherPagerFragment"
+        android:label="fragment_weather_pager"
+        tools:layout="@layout/fragment_weather_pager" />
 
     <fragment
         android:id="@+id/weather_dest"
         android:name="com.lunacattus.app.presentation.features.weather.ui.WeatherFragment"
         android:label="WeatherFragment"
         tools:layout="@layout/fragment_weather">
-        <action
-            android:id="@+id/action_weather_to_city_option"
-            app:destination="@id/city_dest" />
     </fragment>
 
-    <fragment
-        android:id="@+id/city_dest"
-        android:name="com.lunacattus.app.presentation.features.weather.ui.CityOptionFragment"
-        android:label="fragment_city_option"
-        tools:layout="@layout/fragment_city_option">
-        <action
-            android:id="@+id/action_city_to_search"
-            app:destination="@id/search_dest" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/search_dest"
-        android:name="com.lunacattus.app.presentation.features.weather.ui.CitySearchFragment"
-        android:label="CitySearchFragment"
-        tools:layout="@layout/fragment_city_search" />
 </navigation>

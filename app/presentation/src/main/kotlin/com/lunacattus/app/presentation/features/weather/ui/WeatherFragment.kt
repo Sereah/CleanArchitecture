@@ -31,8 +31,16 @@ class WeatherFragment :
 
     private lateinit var hourlyAdapter: HourlyWeatherListAdapter
     private lateinit var dailyAdapter: DailyWeatherListAdapter
+    private var position = 0
 
     override val viewModel: WeatherViewModel by hiltNavGraphViewModels(R.id.weather_navigation)
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            position = it.getInt("POSITION", 0)
+        }
+    }
 
     override fun setupViews(savedInstanceState: Bundle?) {
         MapsInitializer.updatePrivacyShow(requireContext(), true, true)
@@ -71,7 +79,7 @@ class WeatherFragment :
 
         collectState<WeatherUiState.Success.WeatherList, Weather>(
             mapFn = { weatherList ->
-                weatherList.weathers.toMutableList().first { it.geo.isCurrentLocation }
+                weatherList.weathers[position]
             },
             filterFn = {
                 it.nowWeather.id.isNotEmpty() &&

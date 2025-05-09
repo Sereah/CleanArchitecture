@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.WindowInsetsController
 import androidx.fragment.app.viewModels
+import com.amap.api.maps.MapsInitializer
 import com.lunacattus.app.presentation.common.navigation.NavCommand
 import com.lunacattus.app.presentation.common.navigation.NavCommand.Companion.defaultNavDirection
 import com.lunacattus.app.presentation.common.ui.base.BaseFragment
@@ -75,6 +76,8 @@ class HomeFragment :
             }
             .request { allGranted, _, _ ->
                 if (allGranted) {
+                    MapsInitializer.updatePrivacyShow(requireContext(), true, true)
+                    MapsInitializer.updatePrivacyAgree(requireContext(), true)
                     dispatchUiIntent(HomeUiIntent.OnFeatureChatRequested)
                 }
             }

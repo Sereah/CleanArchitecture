@@ -13,10 +13,10 @@ sealed interface WeatherUiState : IUiState {
 
     sealed interface Success : WeatherUiState {
         data class WeatherList(val weathers: List<Weather>) : Success
-        data class Geo(val geo: WeatherGeo) : Success
-        data class Now(val now: NowWeather) : Success
-        data class Daily(val daily: List<DailyWeather>) : Success
-        data class Hourly(val hourly: List<HourlyWeather>) : Success
+        data class SearchGeoList(val geo: List<WeatherGeo>) : Success
+        data class SearchNow(val now: NowWeather) : Success
+        data class SearchDaily(val daily: List<DailyWeather>) : Success
+        data class SearchHourly(val hourly: List<HourlyWeather>) : Success
     }
 
     data class Error(val msg: String) : WeatherUiState

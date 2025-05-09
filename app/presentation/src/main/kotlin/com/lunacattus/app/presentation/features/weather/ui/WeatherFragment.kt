@@ -2,20 +2,12 @@ package com.lunacattus.app.presentation.features.weather.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.WindowInsetsController
-import android.widget.Toast
-import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.amap.api.maps.MapsInitializer
 import com.lunacattus.app.domain.model.Weather
 import com.lunacattus.app.domain.model.WeatherText
 import com.lunacattus.app.presentation.common.ui.UniformItemDecoration
-import com.lunacattus.app.presentation.common.ui.base.BaseFragment
-import com.lunacattus.app.presentation.features.weather.mvi.WeatherSideEffect
-import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiIntent
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState
-import com.lunacattus.app.presentation.features.weather.viewmodel.WeatherViewModel
 import com.lunacattus.clean.common.Logger
 import com.lunacattus.clean.presentation.R
 import com.lunacattus.clean.presentation.databinding.FragmentWeatherBinding
@@ -24,16 +16,13 @@ import com.lunacattus.common.isToday
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class WeatherFragment :
-    BaseFragment<FragmentWeatherBinding, WeatherUiIntent, WeatherUiState, WeatherSideEffect, WeatherViewModel>(
-        FragmentWeatherBinding::inflate
-    ) {
+class WeatherFragment : BaseWeatherFragment<FragmentWeatherBinding>(
+    FragmentWeatherBinding::inflate
+) {
 
+    private var position = 0
     private lateinit var hourlyAdapter: HourlyWeatherListAdapter
     private lateinit var dailyAdapter: DailyWeatherListAdapter
-    private var position = 0
-
-    override val viewModel: WeatherViewModel by hiltNavGraphViewModels(R.id.weather_navigation)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,14 +32,6 @@ class WeatherFragment :
     }
 
     override fun setupViews(savedInstanceState: Bundle?) {
-        MapsInitializer.updatePrivacyShow(requireContext(), true, true)
-        MapsInitializer.updatePrivacyAgree(requireContext(), true)
-        requireActivity().window.insetsController?.apply {
-            setSystemBarsAppearance(
-                0,
-                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
-            )
-        }
         hourlyAdapter = HourlyWeatherListAdapter(requireContext())
         binding.hourlyList.apply {
             adapter = hourlyAdapter
@@ -90,15 +71,8 @@ class WeatherFragment :
             Logger.d(TAG, "collect now weather: ${weather.nowWeather}")
             Logger.d(TAG, "collect daily weather: ${weather.dailyWeather}")
             Logger.d(TAG, "collect hourly weather: ${weather.hourlyWeather}")
+            binding.name.text = weather.geo.name
             bindCurrentLocationWeatherUI(weather)
-        }
-    }
-
-    override fun handleSideEffect(effect: WeatherSideEffect) {
-        when (effect) {
-            is WeatherSideEffect.ShowFailToast -> {
-                Toast.makeText(requireContext(), effect.msg, Toast.LENGTH_LONG).show()
-            }
         }
     }
 
@@ -119,7 +93,6 @@ class WeatherFragment :
 
     @SuppressLint("SetTextI18n")
     private fun bindCurrentLocationWeatherUI(weather: Weather) {
-        binding.name.text = weather.geo.name
         binding.temp.text = weather.nowWeather.temp.toString()
         val today = weather.dailyWeather.first { it.date.isToday() }
         binding.maxTemp.text = "${today.tempMax}°"

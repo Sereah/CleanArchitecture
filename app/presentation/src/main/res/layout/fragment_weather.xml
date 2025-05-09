@@ -7,6 +7,32 @@
     android:background="@drawable/bg_cloudy_weather"
     tools:context="com.lunacattus.app.presentation.features.weather.ui.WeatherFragment">
 
+    <TextView
+        android:id="@+id/cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="40dp"
+        android:text="@string/cancel"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="40dp"
+        android:text="@string/add"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/title_container"
         android:layout_width="wrap_content"
@@ -33,7 +59,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="30dp"
             android:fontFamily="sans-serif-thin"
-            android:text="-.-"
+            android:text="--"
             android:textColor="@color/white"
             android:textSize="100sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -69,7 +95,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-thin"
-                android:text="-.-"
+                android:text="--"
                 android:textColor="@color/white"
                 android:textSize="45sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -96,7 +122,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:fontFamily="sans-serif-thin"
-                android:text="-.-"
+                android:text="--"
                 android:textColor="@color/white"
                 android:textSize="45sp"
                 app:layout_constraintEnd_toStartOf="@+id/min_text"

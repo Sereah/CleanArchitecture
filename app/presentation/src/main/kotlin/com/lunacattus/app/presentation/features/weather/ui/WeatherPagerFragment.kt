@@ -1,25 +1,27 @@
 package com.lunacattus.app.presentation.features.weather.ui
 
 import android.os.Bundle
+import android.view.WindowInsetsController
 import android.widget.ImageView
-import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
-import com.lunacattus.app.presentation.common.ui.base.BaseFragment
-import com.lunacattus.app.presentation.features.weather.mvi.WeatherSideEffect
-import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiIntent
+import com.lunacattus.app.presentation.common.navigation.NavCommand
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState
-import com.lunacattus.app.presentation.features.weather.viewmodel.WeatherViewModel
 import com.lunacattus.clean.presentation.R
 import com.lunacattus.clean.presentation.databinding.FragmentWeatherPagerBinding
+import com.lunacattus.common.setOnClickListenerWithDebounce
 
-class WeatherPagerFragment :
-    BaseFragment<FragmentWeatherPagerBinding, WeatherUiIntent, WeatherUiState, WeatherSideEffect, WeatherViewModel>(
-        FragmentWeatherPagerBinding::inflate
-    ) {
-    override val viewModel: WeatherViewModel by hiltNavGraphViewModels(R.id.weather_navigation)
+class WeatherPagerFragment : BaseWeatherFragment<FragmentWeatherPagerBinding>(
+    FragmentWeatherPagerBinding::inflate
+) {
 
     override fun setupViews(savedInstanceState: Bundle?) {
+        requireActivity().window.insetsController?.apply {
+            setSystemBarsAppearance(
+                0,
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+            )
+        }
         binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 for (i in 0 until binding.tabLayout.tabCount) {
@@ -35,6 +37,13 @@ class WeatherPagerFragment :
                 }
             }
         })
+        binding.menu.setOnClickListenerWithDebounce {
+            navCoordinator().execute(
+                NavCommand.ToDirection(
+                    direction = NavCommand.defaultNavDirection(R.id.action_weatherPager_to_cityOption)
+                )
+            )
+        }
     }
 
     override fun setupObservers() {
@@ -54,9 +63,5 @@ class WeatherPagerFragment :
                 tab.customView = tabView
             }.attach()
         }
-    }
-
-    override fun handleSideEffect(effect: WeatherSideEffect) {
-
     }
 }

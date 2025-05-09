@@ -9,7 +9,11 @@
         android:id="@+id/weatherPager_dest"
         android:name="com.lunacattus.app.presentation.features.weather.ui.WeatherPagerFragment"
         android:label="fragment_weather_pager"
-        tools:layout="@layout/fragment_weather_pager" />
+        tools:layout="@layout/fragment_weather_pager" >
+        <action
+            android:id="@+id/action_weatherPager_to_cityOption"
+            app:destination="@id/cityOptionFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/weather_dest"
@@ -17,5 +21,29 @@
         android:label="WeatherFragment"
         tools:layout="@layout/fragment_weather">
     </fragment>
+
+    <fragment
+        android:id="@+id/cityOptionFragment"
+        android:name="com.lunacattus.app.presentation.features.weather.ui.CityOptionFragment"
+        android:label="fragment_city_option"
+        tools:layout="@layout/fragment_city_option" >
+        <action
+            android:id="@+id/action_cityOption_to_citySearch"
+            app:destination="@id/citySearchFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/citySearchFragment"
+        android:name="com.lunacattus.app.presentation.features.weather.ui.CitySearchFragment"
+        android:label="CitySearchFragment" >
+        <action
+            android:id="@+id/action_citySearch_to_searchDetail"
+            app:destination="@id/search_deatil_dest" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/search_deatil_dest"
+        android:name="com.lunacattus.app.presentation.features.weather.ui.WeatherSearchDetailFragment"
+        android:label="WeatherSearchDetailFragment" />
 
 </navigation>

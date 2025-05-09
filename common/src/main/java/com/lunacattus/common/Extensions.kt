@@ -3,6 +3,7 @@ package com.lunacattus.common
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.widget.EditText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -154,7 +155,7 @@ fun Int.dpToPx(context: Context): Int =
 /**
  * 输入框输入完文字后的防抖策略
  */
-fun EditText.debounce(
+fun EditText.addTextChangeDebounceListener(
     delayMillis: Long,
     coroutineScope: CoroutineScope,
     afterTextChanged: (String) -> Unit
@@ -185,4 +186,21 @@ fun EditText.debounce(
             }
         }
     })
+}
+
+/**
+ * 点击事件防抖
+ */
+inline fun View.setOnClickListenerWithDebounce(
+    debounceTime: Long = 500,
+    crossinline action: (View) -> Unit
+) {
+    var lastClickTime = 0L
+    setOnClickListener {
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastClickTime >= debounceTime) {
+            lastClickTime = currentTime
+            action(it)
+        }
+    }
 }

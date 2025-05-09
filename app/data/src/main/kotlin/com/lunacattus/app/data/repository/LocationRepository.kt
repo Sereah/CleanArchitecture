@@ -110,7 +110,7 @@ class LocationRepository @Inject constructor(
         }
         val locationOption = AMapLocationClientOption().apply {
             locationMode = AMapLocationClientOption.AMapLocationMode.Hight_Accuracy
-            interval = 60 * 1000
+            interval = 10 * 60 * 1000
         }
 
         val locationClient = AMapLocationClient(appContext).apply {

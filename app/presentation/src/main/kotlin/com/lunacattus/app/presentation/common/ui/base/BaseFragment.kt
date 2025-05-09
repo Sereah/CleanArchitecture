@@ -39,7 +39,9 @@ abstract class BaseFragment<
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = inflateBinding(inflater, container, false)
+        if (_binding == null) {
+            _binding = inflateBinding(inflater, container, false)
+        }
         return binding.root
     }
 

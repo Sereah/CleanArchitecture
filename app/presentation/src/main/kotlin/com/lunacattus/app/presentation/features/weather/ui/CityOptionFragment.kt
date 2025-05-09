@@ -1,38 +1,55 @@
 package com.lunacattus.app.presentation.features.weather.ui
 
 import android.os.Bundle
-import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
-import androidx.navigation.NavDirections
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.lunacattus.app.presentation.common.navigation.NavCommand
-import com.lunacattus.app.presentation.common.ui.base.BaseFragment
-import com.lunacattus.app.presentation.features.weather.mvi.WeatherSideEffect
-import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiIntent
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState
-import com.lunacattus.app.presentation.features.weather.viewmodel.WeatherViewModel
+import com.lunacattus.app.presentation.features.weather.ui.CityListAdapter.Companion.CityListItem
+import com.lunacattus.clean.common.Logger
 import com.lunacattus.clean.presentation.R
 import com.lunacattus.clean.presentation.databinding.FragmentCityOptionBinding
 
-class CityOptionFragment :
-    BaseFragment<FragmentCityOptionBinding, WeatherUiIntent, WeatherUiState, WeatherSideEffect, WeatherViewModel>(
-        FragmentCityOptionBinding::inflate
-    ) {
+class CityOptionFragment : BaseWeatherFragment<FragmentCityOptionBinding>(
+    FragmentCityOptionBinding::inflate
+) {
 
-    override val viewModel: WeatherViewModel by hiltNavGraphViewModels(R.id.weather_navigation)
+    private lateinit var cityAdapter: CityListAdapter
 
     override fun setupViews(savedInstanceState: Bundle?) {
-        binding.back.setOnClickListener {
-            navCoordinator().execute(NavCommand.Back)
+        cityAdapter = CityListAdapter(requireContext())
+        binding.cityList.apply {
+            adapter = cityAdapter
+            layoutManager = LinearLayoutManager(requireContext())
         }
         binding.searchView.setOnClickListener {
-
+            navCoordinator().execute(
+                NavCommand.ToDirection(
+                    direction = NavCommand.defaultNavDirection(R.id.action_cityOption_to_citySearch)
+                )
+            )
         }
     }
 
     override fun setupObservers() {
-
+        collectState<WeatherUiState.Success.WeatherList>(
+            filterFn = { it.weathers.isNotEmpty() }
+        ) {
+            val itemList = mutableListOf<CityListItem>()
+            for ((index, weather) in it.weathers.withIndex()) {
+                if (index == 0) {
+                    itemList.add(CityListItem.Title("当前定位"))
+                }
+                if (index == 2) {
+                    itemList.add(CityListItem.Title("已添加城市"))
+                }
+                itemList.add(CityListItem.City(weather))
+            }
+            Logger.d(TAG, "collect item list: ${itemList.size}")
+            cityAdapter.submitList(itemList)
+        }
     }
 
-    override fun handleSideEffect(effect: WeatherSideEffect) {
-
+    companion object {
+        const val TAG = "CityOptionFragment"
     }
 }

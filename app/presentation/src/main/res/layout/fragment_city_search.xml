@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
-    tools:context="com.lunacattus.app.presentation.features.weather.ui.CitySearchFragment">
+    tools:context="com.lunacattus.app.presentation.features.weather.ui.page.CitySearchFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/search_view"

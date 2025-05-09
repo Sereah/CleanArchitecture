@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_cloudy_weather"
-    tools:context="com.lunacattus.app.presentation.features.weather.ui.WeatherFragment">
+    tools:context="com.lunacattus.app.presentation.features.weather.ui.page.WeatherFragment">
 
     <TextView
         android:id="@+id/cancel"

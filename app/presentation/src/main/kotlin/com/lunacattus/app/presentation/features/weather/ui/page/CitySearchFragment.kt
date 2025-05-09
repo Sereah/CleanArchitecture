@@ -1,4 +1,4 @@
-package com.lunacattus.app.presentation.features.weather.ui
+package com.lunacattus.app.presentation.features.weather.ui.page
 
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
@@ -10,6 +10,7 @@ import com.lunacattus.app.presentation.features.weather.mvi.WeatherSideEffect.Sh
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiIntent
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiIntent.OnRequestGetSearchCityWeather
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState
+import com.lunacattus.app.presentation.features.weather.ui.adapter.SearchListAdapter
 import com.lunacattus.clean.common.Logger
 import com.lunacattus.clean.presentation.R
 import com.lunacattus.clean.presentation.databinding.FragmentCitySearchBinding

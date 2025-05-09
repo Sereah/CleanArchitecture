@@ -1,4 +1,4 @@
-package com.lunacattus.app.presentation.features.weather.ui
+package com.lunacattus.app.presentation.features.weather.ui.page
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -10,6 +10,8 @@ import com.lunacattus.app.presentation.common.navigation.NavCommand
 import com.lunacattus.app.presentation.common.ui.UniformItemDecoration
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiIntent
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState
+import com.lunacattus.app.presentation.features.weather.ui.adapter.DailyWeatherListAdapter
+import com.lunacattus.app.presentation.features.weather.ui.adapter.HourlyWeatherListAdapter
 import com.lunacattus.clean.presentation.R
 import com.lunacattus.clean.presentation.databinding.FragmentWeatherBinding
 import com.lunacattus.common.dpToPx

@@ -1,10 +1,11 @@
-package com.lunacattus.app.presentation.features.weather.ui
+package com.lunacattus.app.presentation.features.weather.ui.page
 
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.lunacattus.app.presentation.common.navigation.NavCommand
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState
-import com.lunacattus.app.presentation.features.weather.ui.CityListAdapter.Companion.CityListItem
+import com.lunacattus.app.presentation.features.weather.ui.adapter.CityListAdapter
+import com.lunacattus.app.presentation.features.weather.ui.adapter.CityListAdapter.Companion.CityListItem
 import com.lunacattus.clean.common.Logger
 import com.lunacattus.clean.presentation.R
 import com.lunacattus.clean.presentation.databinding.FragmentCityOptionBinding

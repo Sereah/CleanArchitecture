@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/weatherPager_dest"
-        android:name="com.lunacattus.app.presentation.features.weather.ui.WeatherPagerFragment"
+        android:name="com.lunacattus.app.presentation.features.weather.ui.page.WeatherPagerFragment"
         android:label="fragment_weather_pager"
         tools:layout="@layout/fragment_weather_pager" >
         <action
@@ -17,14 +17,14 @@
 
     <fragment
         android:id="@+id/weather_dest"
-        android:name="com.lunacattus.app.presentation.features.weather.ui.WeatherFragment"
+        android:name="com.lunacattus.app.presentation.features.weather.ui.page.WeatherFragment"
         android:label="WeatherFragment"
         tools:layout="@layout/fragment_weather">
     </fragment>
 
     <fragment
         android:id="@+id/cityOptionFragment"
-        android:name="com.lunacattus.app.presentation.features.weather.ui.CityOptionFragment"
+        android:name="com.lunacattus.app.presentation.features.weather.ui.page.CityOptionFragment"
         android:label="fragment_city_option"
         tools:layout="@layout/fragment_city_option" >
         <action
@@ -34,7 +34,7 @@
 
     <fragment
         android:id="@+id/citySearchFragment"
-        android:name="com.lunacattus.app.presentation.features.weather.ui.CitySearchFragment"
+        android:name="com.lunacattus.app.presentation.features.weather.ui.page.CitySearchFragment"
         android:label="CitySearchFragment" >
         <action
             android:id="@+id/action_citySearch_to_searchDetail"
@@ -43,7 +43,7 @@
 
     <fragment
         android:id="@+id/search_deatil_dest"
-        android:name="com.lunacattus.app.presentation.features.weather.ui.WeatherSearchDetailFragment"
+        android:name="com.lunacattus.app.presentation.features.weather.ui.page.WeatherSearchDetailFragment"
         android:label="WeatherSearchDetailFragment" />
 
 </navigation>

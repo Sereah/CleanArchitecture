@@ -1,4 +1,4 @@
-package com.lunacattus.app.presentation.features.weather.ui
+package com.lunacattus.app.presentation.features.weather.ui.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -8,14 +8,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.lunacattus.app.domain.model.Weather
-import com.lunacattus.app.presentation.features.weather.ui.CityListAdapter.Companion.CityListItem
 import com.lunacattus.clean.common.Logger
 import com.lunacattus.clean.presentation.R
 import com.lunacattus.clean.presentation.databinding.ItemTextViewBinding
 import com.lunacattus.clean.presentation.databinding.ItemWeatherCityBinding
 import com.lunacattus.common.isToday
 
-class CityListAdapter(val context: Context) : ListAdapter<CityListItem, RecyclerView.ViewHolder>(
+class CityListAdapter(val context: Context) : ListAdapter<CityListAdapter.Companion.CityListItem, RecyclerView.ViewHolder>(
     object : DiffUtil.ItemCallback<CityListItem>() {
         override fun areItemsTheSame(
             oldItem: CityListItem,

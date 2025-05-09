@@ -1,4 +1,4 @@
-package com.lunacattus.app.presentation.features.weather.ui
+package com.lunacattus.app.presentation.features.weather.ui.page
 
 import android.os.Bundle
 import android.view.WindowInsetsController
@@ -7,6 +7,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import com.lunacattus.app.presentation.common.navigation.NavCommand
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState
+import com.lunacattus.app.presentation.features.weather.ui.adapter.WeatherPagerAdapter
 import com.lunacattus.clean.presentation.R
 import com.lunacattus.clean.presentation.databinding.FragmentWeatherPagerBinding
 import com.lunacattus.common.setOnClickListenerWithDebounce

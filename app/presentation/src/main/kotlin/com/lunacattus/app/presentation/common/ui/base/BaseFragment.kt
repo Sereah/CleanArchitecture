@@ -1,6 +1,8 @@
 package com.lunacattus.app.presentation.common.ui.base
 
 import android.os.Bundle
+import android.os.Parcelable
+import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +15,7 @@ import androidx.viewbinding.ViewBinding
 import com.lunacattus.app.presentation.common.di.NavCoordinatorEntryPoint
 import com.lunacattus.app.presentation.common.navigation.NavCoordinator
 import com.lunacattus.app.presentation.common.ui.dialog.DialogShareViewModel
+import com.lunacattus.clean.common.Logger
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -32,13 +35,21 @@ abstract class BaseFragment<
     private var _binding: VB? = null
     protected val binding get() = _binding!!
     private val dialogViewModel: DialogShareViewModel by activityViewModels()
+    private val viewStates = SparseArray<Parcelable>()
+
     abstract val viewModel: VM
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Logger.d(TAG, "onCreate: ${this.javaClass.simpleName}")
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        Logger.d(TAG, "onCreateView: ${this.javaClass.simpleName}")
         if (_binding == null) {
             _binding = inflateBinding(inflater, container, false)
         }
@@ -52,9 +63,49 @@ abstract class BaseFragment<
         observeSideEffect()
     }
 
+    override fun onStart() {
+        super.onStart()
+        Logger.d(TAG, "onStart: ${this.javaClass.simpleName}")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Logger.d(TAG, "onResume: ${this.javaClass.simpleName}")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Logger.d(TAG, "onPause: ${this.javaClass.simpleName}")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Logger.d(TAG, "onStop: ${this.javaClass.simpleName}")
+    }
+
     override fun onDestroyView() {
+        Logger.d(TAG, "onDestroyView: ${this.javaClass.simpleName}")
         _binding = null
         super.onDestroyView()
+    }
+
+    override fun onDestroy() {
+        Logger.d(TAG, "onDestroy: ${this.javaClass.simpleName}")
+        viewStates.clear()
+        super.onDestroy()
+    }
+
+    protected fun saveViewStates(vararg views: View) {
+        viewStates.clear()
+        views.forEach { view ->
+            view.saveHierarchyState(viewStates)
+        }
+    }
+
+    protected fun restoreViewStates(vararg views: View) {
+        views.forEach { view ->
+            view.restoreHierarchyState(viewStates)
+        }
     }
 
     protected abstract fun setupViews(savedInstanceState: Bundle?)
@@ -107,5 +158,9 @@ abstract class BaseFragment<
                 }
             }
         }
+    }
+
+    companion object {
+        const val TAG = "BaseFragment"
     }
 }

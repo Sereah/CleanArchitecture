@@ -1,4 +1,4 @@
-package com.lunacattus.app.presentation.features.weather.ui
+package com.lunacattus.app.presentation.features.weather.ui.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context

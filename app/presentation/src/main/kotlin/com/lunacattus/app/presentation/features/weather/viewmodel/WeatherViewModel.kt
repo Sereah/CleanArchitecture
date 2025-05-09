@@ -10,12 +10,15 @@ import com.lunacattus.app.domain.usecase.weather.QueryAllWeatherUseCase
 import com.lunacattus.app.domain.usecase.weather.RequestAndSaveWeatherUseCase
 import com.lunacattus.app.presentation.common.ui.base.BaseViewModel
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherSideEffect
-import com.lunacattus.app.presentation.features.weather.mvi.WeatherSideEffect.*
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherSideEffect.ShowFailToast
+import com.lunacattus.app.presentation.features.weather.mvi.WeatherSideEffect.ShowWeatherDetailPage
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiIntent
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState
-import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState.Success.*
+import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState.Success.SearchDaily
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState.Success.SearchGeoList
+import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState.Success.SearchHourly
+import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState.Success.SearchNow
+import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState.Success.WeatherList
 import com.lunacattus.clean.common.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -124,7 +127,7 @@ class WeatherViewModel @Inject constructor(
                     Logger.d(TAG, "request and save current location weather success!")
                 }.onFailure {
                     sendSideEffect(
-                        WeatherSideEffect.ShowFailToast(
+                        ShowFailToast(
                             msg = it.localizedMessage ?: ""
                         )
                     )
@@ -139,11 +142,11 @@ class WeatherViewModel @Inject constructor(
                 flow.filter { it.isNotEmpty() }.distinctUntilChanged().collect { weather ->
                     Logger.d(TAG, "query all weather: ${weather.size}")
                     updateUiState {
-                        WeatherUiState.Success.WeatherList(weather)
+                        WeatherList(weather)
                     }
                 }
             }.onFailure {
-                sendSideEffect(WeatherSideEffect.ShowFailToast(msg = it.localizedMessage ?: ""))
+                sendSideEffect(ShowFailToast(msg = it.localizedMessage ?: ""))
             }
         }
     }

@@ -4,15 +4,21 @@ import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.lunacattus.app.presentation.common.navigation.NavCommand
+import com.lunacattus.app.presentation.common.navigation.NavCommand.Companion.defaultNavDirection
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherSideEffect
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherSideEffect.ShowWeatherDetailPage
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiIntent
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiIntent.GetSearchCityWeather
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState
 import com.lunacattus.app.presentation.features.weather.ui.adapter.SearchListAdapter
+import com.lunacattus.app.presentation.features.weather.ui.page.WeatherSearchDetailDialog.Companion.GEO_ID
+import com.lunacattus.app.presentation.features.weather.ui.page.WeatherSearchDetailDialog.Companion.GEO_NAME
 import com.lunacattus.clean.common.Logger
+import com.lunacattus.clean.presentation.R
 import com.lunacattus.clean.presentation.databinding.FragmentCitySearchBinding
 import com.lunacattus.common.addTextChangeDebounceListener
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class CitySearchFragment : BaseWeatherFragment<FragmentCitySearchBinding>(
     FragmentCitySearchBinding::inflate
@@ -28,8 +34,7 @@ class CitySearchFragment : BaseWeatherFragment<FragmentCitySearchBinding>(
             dispatchUiIntent(WeatherUiIntent.SearchCity(it))
         }
         searchAdapter = SearchListAdapter(requireContext()) {
-//            dispatchUiIntent(GetSearchCityWeather(it))
-            dispatchUiIntent(WeatherUiIntent.OnRequestAddCity(it.id))
+            dispatchUiIntent(GetSearchCityWeather(it))
         }
         binding.searchList.apply {
             adapter = searchAdapter
@@ -46,11 +51,28 @@ class CitySearchFragment : BaseWeatherFragment<FragmentCitySearchBinding>(
 
     override fun handleSideEffect(effect: WeatherSideEffect) {
         super.handleSideEffect(effect)
+        Logger.d(TAG, "handleSideEffect: $effect")
         when (effect) {
             is ShowWeatherDetailPage -> {
                 val bundle = Bundle().apply {
-                    putString("GEO_NAME", effect.geo.name)
-                    putString("GEO_ID", effect.geo.id)
+                    putString(GEO_ID, effect.geo.id)
+                    putString(GEO_NAME, effect.geo.name)
+                }
+                navCoordinator().execute(
+                    NavCommand.ToDirection(
+                        direction = defaultNavDirection(
+                            R.id.action_citySearch_to_dialog_detail_dest,
+                            bundle
+                        ),
+                        options = null
+                    )
+                )
+            }
+
+            is WeatherSideEffect.BackToCityOptionPage -> {
+                lifecycleScope.launch {
+                    delay(500)
+                    navCoordinator().execute(NavCommand.Back)
                 }
             }
 

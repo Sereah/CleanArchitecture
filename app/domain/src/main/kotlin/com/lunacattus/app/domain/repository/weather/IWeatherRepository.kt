@@ -18,4 +18,5 @@ interface IWeatherRepository {
     suspend fun getHourlyWeather(locationId: String): Result<List<HourlyWeather>>
     fun queryAllWeather(): Result<Flow<List<Weather>>>
     suspend fun updateSavedCityWeather(): Result<Unit>
+    suspend fun queryGeo(id: String): Result<WeatherGeo?>
 }

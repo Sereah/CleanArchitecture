@@ -12,39 +12,39 @@ import com.lunacattus.clean.common.Logger
 import com.lunacattus.clean.presentation.R
 import com.lunacattus.clean.presentation.databinding.ItemTextViewBinding
 import com.lunacattus.clean.presentation.databinding.ItemWeatherCityBinding
-import com.lunacattus.common.isToday
 
-class CityListAdapter(val context: Context) : ListAdapter<CityListAdapter.Companion.CityListItem, RecyclerView.ViewHolder>(
-    object : DiffUtil.ItemCallback<CityListItem>() {
-        override fun areItemsTheSame(
-            oldItem: CityListItem,
-            newItem: CityListItem
-        ): Boolean {
-            return if (oldItem is CityListItem.City && newItem is CityListItem.City) {
-                oldItem.weather.geo.id == newItem.weather.geo.id
-            } else {
-                oldItem.javaClass == newItem.javaClass
+class CityListAdapter(val context: Context) :
+    ListAdapter<CityListAdapter.Companion.CityListItem, RecyclerView.ViewHolder>(
+        object : DiffUtil.ItemCallback<CityListItem>() {
+            override fun areItemsTheSame(
+                oldItem: CityListItem,
+                newItem: CityListItem
+            ): Boolean {
+                return if (oldItem is CityListItem.City && newItem is CityListItem.City) {
+                    oldItem.weather.geo.id == newItem.weather.geo.id
+                } else {
+                    oldItem.javaClass == newItem.javaClass
+                }
+            }
+
+            override fun areContentsTheSame(
+                oldItem: CityListItem,
+                newItem: CityListItem
+            ): Boolean {
+                return if (oldItem is CityListItem.City && newItem is CityListItem.City) {
+                    oldItem.weather.geo.name == newItem.weather.geo.name &&
+                            oldItem.weather.nowWeather.temp == newItem.weather.nowWeather.temp &&
+                            oldItem.weather.nowWeather.weatherText == newItem.weather.nowWeather.weatherText &&
+                            oldItem.weather.dailyWeather.isNotEmpty() &&
+                            newItem.weather.dailyWeather.isNotEmpty() &&
+                            oldItem.weather.dailyWeather[0].tempMax == newItem.weather.dailyWeather[0].tempMax &&
+                            oldItem.weather.dailyWeather[0].tempMin == newItem.weather.dailyWeather[0].tempMin
+                } else {
+                    oldItem == newItem
+                }
             }
         }
-
-        override fun areContentsTheSame(
-            oldItem: CityListItem,
-            newItem: CityListItem
-        ): Boolean {
-            return if (oldItem is CityListItem.City && newItem is CityListItem.City) {
-                oldItem.weather.geo.name == newItem.weather.geo.name &&
-                        oldItem.weather.nowWeather.temp == newItem.weather.nowWeather.temp &&
-                        oldItem.weather.nowWeather.weatherText == newItem.weather.nowWeather.weatherText &&
-                        oldItem.weather.dailyWeather.isNotEmpty() &&
-                        newItem.weather.dailyWeather.isNotEmpty() &&
-                        oldItem.weather.dailyWeather[0].tempMax == newItem.weather.dailyWeather[0].tempMax &&
-                        oldItem.weather.dailyWeather[0].tempMin == newItem.weather.dailyWeather[0].tempMin
-            } else {
-                oldItem == newItem
-            }
-        }
-    }
-) {
+    ) {
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
@@ -101,11 +101,11 @@ class CityListAdapter(val context: Context) : ListAdapter<CityListAdapter.Compan
                 holder.binding.name.text = item.weather.geo.name
                 holder.binding.weatherText.text = item.weather.nowWeather.weatherText.toString()
                 holder.binding.temp.text = "${item.weather.nowWeather.temp}°"
-                val today = item.weather.dailyWeather.toMutableList().firstOrNull { it.date.isToday() }
-                today?.let {
-                    holder.binding.maxTemp.text = "${it.tempMax}°"
-                    holder.binding.minTemp.text = "${it.tempMin}°"
+                item.weather.dailyWeather.takeIf { it.isNotEmpty() }?.let {
+                    holder.binding.maxTemp.text = "${it[0].tempMax}°"
+                    holder.binding.minTemp.text = "${it[0].tempMin}°"
                 }
+
             }
         }
     }

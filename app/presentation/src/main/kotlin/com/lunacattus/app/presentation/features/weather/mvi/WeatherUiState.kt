@@ -17,6 +17,7 @@ sealed interface WeatherUiState : IUiState {
         data class SearchNow(val now: NowWeather) : Success
         data class SearchDaily(val daily: List<DailyWeather>) : Success
         data class SearchHourly(val hourly: List<HourlyWeather>) : Success
+        data class QueryGeo(val geo: WeatherGeo?): Success
     }
 
     data class Error(val msg: String) : WeatherUiState

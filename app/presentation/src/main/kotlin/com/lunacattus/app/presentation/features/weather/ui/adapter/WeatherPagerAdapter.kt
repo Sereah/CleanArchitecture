@@ -8,15 +8,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.lunacattus.app.domain.model.Weather
-import com.lunacattus.app.domain.model.WeatherText
 import com.lunacattus.app.presentation.common.ui.UniformItemDecoration
-import com.lunacattus.clean.common.Logger
-import com.lunacattus.clean.presentation.R
 import com.lunacattus.clean.presentation.databinding.WidgetWeatherDetailBinding
 import com.lunacattus.common.dpToPx
-import com.lunacattus.common.isToday
 
-class WeatherPagerAdapter() :
+class WeatherPagerAdapter :
     ListAdapter<Weather, WeatherPagerAdapter.WeatherPagerViewHolder>(object :
         DiffUtil.ItemCallback<Weather>() {
 
@@ -61,8 +57,12 @@ class WeatherPagerAdapter() :
             binding.minTemp.text = "${today.tempMin}°"
         }
         binding.weatherText.text = weather.nowWeather.weatherText.toString()
-        holder.hourlyAdapter.submitList(weather.hourlyWeather)
-        holder.dailyAdapter.submitList(weather.dailyWeather)
+        holder.hourlyAdapter.submitList(weather.hourlyWeather.map {
+            HourlyWeatherListAdapter.Companion.HourlyItem(it, weather.geo.timeZone)
+        })
+        holder.dailyAdapter.submitList(weather.dailyWeather.map {
+            DailyWeatherListAdapter.Companion.DailyItem(it, weather.geo.timeZone)
+        })
     }
 
     inner class WeatherPagerViewHolder(val binding: WidgetWeatherDetailBinding) :

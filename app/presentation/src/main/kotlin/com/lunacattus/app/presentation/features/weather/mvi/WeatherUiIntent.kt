@@ -7,5 +7,5 @@ sealed interface WeatherUiIntent : IUiIntent {
     data class SearchCity(val key: String) : WeatherUiIntent
     data class GetSearchCityWeather(val geo: WeatherGeo) : WeatherUiIntent
     data class OnRequestAddCity(val id: String): WeatherUiIntent
-    data class OnRequestUpdateWeather(val id: String, val isCurrentLocation: Boolean): WeatherUiIntent
+    data class QueryGeoById(val id: String): WeatherUiIntent
 }

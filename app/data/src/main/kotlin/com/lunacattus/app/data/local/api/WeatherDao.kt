@@ -57,5 +57,8 @@ interface WeatherDao {
     fun queryAllQWeather(): Flow<List<QWeatherEntity>>
 
     @Query("SELECT * FROM q_weather_geo WHERE isCurrentLocation = :isCurrentLocation")
-    suspend fun getGeo(isCurrentLocation: Boolean): List<QWeatherGeoEntity>
+    suspend fun queryGeo(isCurrentLocation: Boolean): List<QWeatherGeoEntity>
+
+    @Query("SELECT * FROM q_weather_geo WHERE locationId = :id")
+    suspend fun queryGeo(id: String): QWeatherGeoEntity?
 }

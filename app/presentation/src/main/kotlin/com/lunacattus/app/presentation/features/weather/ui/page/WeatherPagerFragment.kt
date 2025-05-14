@@ -8,6 +8,7 @@ import com.lunacattus.app.domain.model.WeatherText
 import com.lunacattus.app.presentation.common.navigation.NavCommand
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState
 import com.lunacattus.app.presentation.features.weather.ui.adapter.WeatherPagerAdapter
+import com.lunacattus.clean.common.Logger
 import com.lunacattus.clean.presentation.R
 import com.lunacattus.clean.presentation.databinding.FragmentWeatherPagerBinding
 import com.lunacattus.common.setOnClickListenerWithDebounce
@@ -39,7 +40,7 @@ class WeatherPagerFragment : BaseWeatherFragment<FragmentWeatherPagerBinding>(
                 val weather = pagerAdapter.currentList[position]
 //                Logger.d(TAG, "onPageSelected: $weather")
                 val bg =
-                    if (weather.dailyWeather.isNotEmpty() && weather.dailyWeather[0].sunset < System.currentTimeMillis()) {
+                    if (weather.dailyWeather.isNotEmpty() && weather.dailyWeather[0].sunset > weather.nowWeather.obsTime) {
                         when (weather.nowWeather.weatherText) {
                             WeatherText.SUNNY -> R.drawable.bg_sunny_weather
                             WeatherText.FOGGY,
@@ -63,8 +64,10 @@ class WeatherPagerFragment : BaseWeatherFragment<FragmentWeatherPagerBinding>(
     override fun setupObservers() {
         collectState<WeatherUiState.Success.WeatherList, List<Weather>>(
             mapFn = { it.weathers },
-            filterFn = { it.isNotEmpty() }
+            filterFn = { it.isNotEmpty() },
         ) {
+            Logger.d(TAG, "collect weather list, size=${it.size}")
+            Logger.d(TAG, "collect weather: ${it[0].nowWeather}")
             pagerAdapter.submitList(it)
         }
     }

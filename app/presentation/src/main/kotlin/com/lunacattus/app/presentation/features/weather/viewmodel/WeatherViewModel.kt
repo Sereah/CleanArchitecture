@@ -7,6 +7,7 @@ import com.lunacattus.app.domain.usecase.weather.GetHourlyWeatherUseCase
 import com.lunacattus.app.domain.usecase.weather.GetNowWeatherUseCase
 import com.lunacattus.app.domain.usecase.weather.GetWeatherGeoListUseCase
 import com.lunacattus.app.domain.usecase.weather.QueryAllWeatherUseCase
+import com.lunacattus.app.domain.usecase.weather.QueryGeoByIdUseCase
 import com.lunacattus.app.domain.usecase.weather.RequestAndSaveWeatherUseCase
 import com.lunacattus.app.domain.usecase.weather.UpdateSavedCityWeatherUseCase
 import com.lunacattus.app.presentation.common.ui.base.BaseViewModel
@@ -22,6 +23,7 @@ import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState.Succe
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState.Success.WeatherList
 import com.lunacattus.clean.common.Logger
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
@@ -37,7 +39,8 @@ class WeatherViewModel @Inject constructor(
     private val getWeatherGeoListUseCase: GetWeatherGeoListUseCase,
     private val getNowWeatherUseCase: GetNowWeatherUseCase,
     private val getDailyWeatherUseCase: GetDailyWeatherUseCase,
-    private val getHourlyWeatherUseCase: GetHourlyWeatherUseCase
+    private val getHourlyWeatherUseCase: GetHourlyWeatherUseCase,
+    private val queryGeoByIdUseCase: QueryGeoByIdUseCase
 ) : BaseViewModel<WeatherUiIntent, WeatherUiState, WeatherSideEffect>() {
 
     init {
@@ -100,14 +103,17 @@ class WeatherViewModel @Inject constructor(
             }
 
             is WeatherUiIntent.OnRequestAddCity -> {
+                sendSideEffect(WeatherSideEffect.BackToCityOptionPage)
                 viewModelScope.launch {
                     requestAndSaveWeatherUseCase.invoke(intent.id, false)
                 }
             }
 
-            is WeatherUiIntent.OnRequestUpdateWeather -> {
+            is WeatherUiIntent.QueryGeoById -> {
                 viewModelScope.launch {
-                    requestAndSaveWeatherUseCase.invoke(intent.id, intent.isCurrentLocation)
+                    queryGeoByIdUseCase.invoke(intent.id).onSuccess { geo ->
+                        updateUiState { WeatherUiState.Success.QueryGeo(geo) }
+                    }
                 }
             }
         }
@@ -129,6 +135,7 @@ class WeatherViewModel @Inject constructor(
                     )
                     return@collect
                 }
+                delay(1000)
                 requestAndSaveWeatherUseCase.invoke(
                     "${location.longitude},${location.latitude}",
                     true
@@ -147,6 +154,7 @@ class WeatherViewModel @Inject constructor(
 
     private fun updateCitiesWeather() {
         viewModelScope.launch {
+            delay(3 * 1000)
             updateSavedCityWeatherUseCase.invoke().onSuccess {
                 Logger.d(TAG, "updateCitiesWeather success.")
             }

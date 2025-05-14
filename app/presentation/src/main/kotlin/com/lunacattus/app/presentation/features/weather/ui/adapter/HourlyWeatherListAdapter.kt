@@ -9,26 +9,29 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.lunacattus.app.domain.model.HourlyWeather
 import com.lunacattus.clean.presentation.databinding.ItemWeatherHourlyBinding
+import com.lunacattus.common.parseToTimestamp
 import com.lunacattus.common.toFormattedDateTime
+import java.time.ZoneId
 
 class HourlyWeatherListAdapter(val context: Context) :
-    ListAdapter<HourlyWeather, HourlyWeatherListAdapter.HourViewHolder>(object :
-        DiffUtil.ItemCallback<HourlyWeather>() {
-        override fun areItemsTheSame(
-            oldItem: HourlyWeather,
-            newItem: HourlyWeather
-        ): Boolean {
-            return oldItem.time == newItem.time
-        }
+    ListAdapter<HourlyWeatherListAdapter.Companion.HourlyItem, HourlyWeatherListAdapter.HourViewHolder>(
+        object :
+            DiffUtil.ItemCallback<HourlyItem>() {
+            override fun areItemsTheSame(
+                oldItem: HourlyItem,
+                newItem: HourlyItem
+            ): Boolean {
+                return oldItem.weather.time == newItem.weather.time
+            }
 
-        override fun areContentsTheSame(
-            oldItem: HourlyWeather,
-            newItem: HourlyWeather
-        ): Boolean {
-            return oldItem == newItem
-        }
+            override fun areContentsTheSame(
+                oldItem: HourlyItem,
+                newItem: HourlyItem
+            ): Boolean {
+                return oldItem == newItem
+            }
 
-    }) {
+        }) {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -47,11 +50,19 @@ class HourlyWeatherListAdapter(val context: Context) :
     ) {
         val item = getItem(position)
         val binding = holder.binding
-        binding.time.text = "${item.time.toFormattedDateTime("HH")}点"
-        binding.weatherText.text = item.weatherText.toString()
-        binding.temp.text = "${item.temp}°"
+        binding.time.text =
+            "${
+                item.weather.time.parseToTimestamp(ZoneId.of(item.timeZone))
+                    .toFormattedDateTime("HH", ZoneId.of(item.timeZone))
+            }点"
+        binding.weatherText.text = item.weather.weatherText.toString()
+        binding.temp.text = "${item.weather.temp}°"
     }
 
     class HourViewHolder(val binding: ItemWeatherHourlyBinding) :
         RecyclerView.ViewHolder(binding.root)
+
+    companion object {
+        data class HourlyItem(val weather: HourlyWeather, val timeZone: String)
+    }
 }

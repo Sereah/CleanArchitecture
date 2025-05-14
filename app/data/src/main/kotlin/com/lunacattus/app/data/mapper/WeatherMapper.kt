@@ -21,7 +21,6 @@ import com.lunacattus.app.domain.model.WeatherGeo
 import com.lunacattus.app.domain.model.WeatherText
 import com.lunacattus.app.domain.model.WindDirection
 import com.lunacattus.app.domain.model.WindScale
-import com.lunacattus.common.parseToTimestamp
 
 object WeatherMapper {
 
@@ -87,7 +86,7 @@ object WeatherMapper {
         return NowWeather(
             id = locationId,
             isCurrentLocation = isCurrentLocation,
-            obsTime = this.now.obsTime.parseToTimestamp(),
+            obsTime = this.now.obsTime,
             temp = this.now.temp,
             feelsLike = this.now.feelsTemp,
             weatherText = WeatherText.fromString(this.now.text),
@@ -145,11 +144,11 @@ object WeatherMapper {
             DailyWeather(
                 id = locationId,
                 isCurrentLocation = isCurrentLocation,
-                date = it.fxDate.parseToTimestamp(),
-                sunrise = it.sunrise.parseToTimestamp(),
-                sunset = it.sunset.parseToTimestamp(),
-                moonrise = it.moonrise.parseToTimestamp(),
-                moonSet = it.moonSet.parseToTimestamp(),
+                date = it.fxDate,
+                sunrise = it.sunrise,
+                sunset = it.sunset,
+                moonrise = it.moonrise,
+                moonSet = it.moonSet,
                 moonPhase = it.moonPhase,
                 tempMax = it.tempMax,
                 tempMin = it.tempMin,
@@ -203,7 +202,7 @@ object WeatherMapper {
             HourlyWeather(
                 id = locationId,
                 isCurrentLocation = isCurrentLocation,
-                time = it.fxTime.parseToTimestamp(),
+                time = it.fxTime,
                 temp = it.temp,
                 weatherText = WeatherText.fromString(it.text),
                 windDirection = WindDirection.fromDegrees(it.wind360),
@@ -236,7 +235,7 @@ object WeatherMapper {
     fun QWeatherNowEntity.mapperToModel(): NowWeather {
         return NowWeather(
             id = this.locationId,
-            obsTime = this.obsTime.parseToTimestamp(),
+            obsTime = this.obsTime,
             temp = this.temp,
             feelsLike = this.feelsTemp,
             weatherText = WeatherText.fromString(this.text),
@@ -257,11 +256,11 @@ object WeatherMapper {
         return this.let {
             DailyWeather(
                 id = it.locationId,
-                date = it.fxDate.parseToTimestamp(),
-                sunrise = it.sunrise.parseToTimestamp(),
-                sunset = it.sunset.parseToTimestamp(),
-                moonrise = it.moonrise.parseToTimestamp(),
-                moonSet = it.moonSet.parseToTimestamp(),
+                date = it.fxDate,
+                sunrise = it.sunrise,
+                sunset = it.sunset,
+                moonrise = it.moonrise,
+                moonSet = it.moonSet,
                 moonPhase = it.moonPhase,
                 tempMax = it.tempMax,
                 tempMin = it.tempMin,
@@ -288,7 +287,7 @@ object WeatherMapper {
         return this.let {
             HourlyWeather(
                 id = it.locationId,
-                time = it.fxTime.parseToTimestamp(),
+                time = it.fxTime,
                 temp = it.temp,
                 weatherText = WeatherText.fromString(it.text),
                 windDirection = WindDirection.fromDegrees(it.wind360),

@@ -1,20 +1,16 @@
 package com.lunacattus.app.presentation.common.ui.base
 
 import android.os.Bundle
-import android.os.Parcelable
-import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewbinding.ViewBinding
 import com.lunacattus.app.presentation.common.di.NavCoordinatorEntryPoint
 import com.lunacattus.app.presentation.common.navigation.NavCoordinator
-import com.lunacattus.app.presentation.common.ui.dialog.DialogShareViewModel
 import com.lunacattus.clean.common.Logger
 import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -34,8 +30,6 @@ abstract class BaseFragment<
 
     private var _binding: VB? = null
     protected val binding get() = _binding!!
-    private val dialogViewModel: DialogShareViewModel by activityViewModels()
-    private val viewStates = SparseArray<Parcelable>()
 
     abstract val viewModel: VM
 
@@ -91,21 +85,7 @@ abstract class BaseFragment<
 
     override fun onDestroy() {
         Logger.d(TAG, "onDestroy: ${this.javaClass.simpleName}")
-        viewStates.clear()
         super.onDestroy()
-    }
-
-    protected fun saveViewStates(vararg views: View) {
-        viewStates.clear()
-        views.forEach { view ->
-            view.saveHierarchyState(viewStates)
-        }
-    }
-
-    protected fun restoreViewStates(vararg views: View) {
-        views.forEach { view ->
-            view.restoreHierarchyState(viewStates)
-        }
     }
 
     protected abstract fun setupViews(savedInstanceState: Bundle?)
@@ -115,6 +95,7 @@ abstract class BaseFragment<
     protected inline fun <reified T : STATE, R> collectState(
         crossinline mapFn: (T) -> R,
         crossinline filterFn: (R) -> Boolean = { true },
+        noinline distinctUntilChangedFn: (old: R, new: R) -> Boolean = { old, new -> old == new },
         noinline collectFn: (R) -> Unit
     ) {
         lifecycleScope.launch {
@@ -123,7 +104,7 @@ abstract class BaseFragment<
                     .filterIsInstance<T>()
                     .map { mapFn(it) }
                     .filter { filterFn(it) }
-                    .distinctUntilChanged()
+                    .distinctUntilChanged(distinctUntilChangedFn)
                     .collect { collectFn(it) }
             }
         }
@@ -147,8 +128,6 @@ abstract class BaseFragment<
         )
         return entryPoint.navCoordinator()
     }
-
-    protected fun dialogResultState() = dialogViewModel.resultState
 
     private fun observeSideEffect() {
         viewLifecycleOwner.lifecycleScope.launch {

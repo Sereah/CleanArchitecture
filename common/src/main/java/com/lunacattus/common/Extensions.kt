@@ -10,7 +10,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
-import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -19,21 +18,19 @@ import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
-import java.time.format.TextStyle
-import java.util.Locale
 import kotlin.math.roundToInt
 
 /**
  * 将日期时间字符串解析为时间戳（Long）
  */
-fun String.parseToTimestamp(): Long {
+fun String.parseToTimestamp(zoneId: ZoneId = ZoneId.systemDefault()): Long {
     return try {
         when {
             // 格式：yyyy-MM-dd HH:mm:ss
             matches(Regex("^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$")) -> {
                 LocalDateTime
                     .parse(this, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                    .atZone(ZoneId.systemDefault())
+                    .atZone(zoneId)
                     .toInstant()
                     .toEpochMilli()
             }
@@ -41,7 +38,7 @@ fun String.parseToTimestamp(): Long {
             matches(Regex("^\\d{4}-\\d{2}-\\d{2}$")) -> {
                 LocalDate
                     .parse(this, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                    .atStartOfDay(ZoneId.systemDefault())
+                    .atStartOfDay(zoneId)
                     .toInstant()
                     .toEpochMilli()
             }
@@ -49,8 +46,8 @@ fun String.parseToTimestamp(): Long {
             matches(Regex("^\\d{2}:\\d{2}:\\d{2}$")) -> {
                 LocalTime
                     .parse(this, DateTimeFormatter.ofPattern("HH:mm:ss"))
-                    .atDate(LocalDate.now()) // 使用当前日期
-                    .atZone(ZoneId.systemDefault())
+                    .atDate(LocalDate.now(zoneId)) // 使用当前日期
+                    .atZone(zoneId)
                     .toInstant()
                     .toEpochMilli()
             }
@@ -58,8 +55,8 @@ fun String.parseToTimestamp(): Long {
             matches(Regex("^\\d{2}:\\d{2}$")) -> {
                 LocalTime
                     .parse(this, DateTimeFormatter.ofPattern("HH:mm"))
-                    .atDate(LocalDate.now()) // 使用当前日期
-                    .atZone(ZoneId.systemDefault())
+                    .atDate(LocalDate.now(zoneId)) // 使用当前日期
+                    .atZone(zoneId)
                     .toInstant()
                     .toEpochMilli()
             }
@@ -90,29 +87,32 @@ fun String.parseToTimestamp(): Long {
  * 如果时间戳是三天内，则只输出小时（HH）
  * @param format 目标格式（默认 "yyyy-MM-dd HH:mm:ss"）
  */
-fun Long.toFormattedDateTime(format: String = "yyyy-MM-dd HH:mm:ss"): String {
+fun Long.toFormattedDateTime(
+    format: String = "yyyy-MM-dd HH:mm:ss",
+    zoneId: ZoneId = ZoneId.systemDefault()
+): String {
     val formatter = DateTimeFormatter.ofPattern(format)
     return Instant.ofEpochMilli(this)
-        .atZone(ZoneId.systemDefault())
+        .atZone(zoneId)
         .format(formatter)
 }
 
 /**
  * 将时间戳（Long）转换为 ISO 8601 格式（yyyy-MM-ddTHH:mm:ssXXX）
  */
-fun Long.toIso8601DateTime(): String {
+fun Long.toIso8601DateTime(zoneId: ZoneId = ZoneId.systemDefault()): String {
     val formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
     return Instant.ofEpochMilli(this)
-        .atZone(ZoneId.systemDefault())
+        .atZone(zoneId)
         .format(formatter)
 }
 
 /**
  * 将时间戳（Long）转换为星期几的中文表示
  */
-fun Long.toChineseDayOfWeek(): String {
+fun Long.toChineseDayOfWeek(zoneId: ZoneId = ZoneId.systemDefault()): String {
     val instant = Instant.ofEpochMilli(this)
-    val zonedDateTime = instant.atZone(ZoneId.systemDefault())
+    val zonedDateTime = instant.atZone(zoneId)
     val dayOfWeek = zonedDateTime.dayOfWeek
 
     return when (dayOfWeek) {
@@ -129,9 +129,9 @@ fun Long.toChineseDayOfWeek(): String {
 /**
  * 根据时间戳判断是否是今天
  */
-fun Long.isToday(): Boolean {
-    val givenDate = Instant.ofEpochMilli(this).atZone(ZoneId.systemDefault()).toLocalDate()
-    val currentDate = LocalDate.now()
+fun Long.isToday(zoneId: ZoneId = ZoneId.systemDefault()): Boolean {
+    val givenDate = Instant.ofEpochMilli(this).atZone(zoneId).toLocalDate()
+    val currentDate = LocalDate.now(zoneId)
     return givenDate == currentDate
 }
 

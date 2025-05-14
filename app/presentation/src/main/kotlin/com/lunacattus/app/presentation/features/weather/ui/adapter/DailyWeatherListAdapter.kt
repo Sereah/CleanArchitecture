@@ -2,21 +2,22 @@ package com.lunacattus.app.presentation.features.weather.ui.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.lunacattus.app.domain.model.DailyWeather
-import com.lunacattus.app.presentation.features.weather.ui.adapter.WeatherPagerAdapter.Companion.TAG
-import com.lunacattus.clean.common.Logger
 import com.lunacattus.clean.presentation.databinding.ItemWeatherDailyBinding
 import com.lunacattus.common.isToday
+import com.lunacattus.common.parseToTimestamp
 import com.lunacattus.common.toChineseDayOfWeek
+import java.time.ZoneId
 
 class DailyWeatherListAdapter(val context: Context) :
-    ListAdapter<DailyWeather, DailyWeatherListAdapter.ViewHolder>(diffCallback) {
+    ListAdapter<DailyWeatherListAdapter.Companion.DailyItem, DailyWeatherListAdapter.ViewHolder>(
+        diffCallback
+    ) {
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -37,9 +38,14 @@ class DailyWeatherListAdapter(val context: Context) :
     ) {
         val item = getItem(position)
         val binding = holder.binding
-        binding.week.text = if (item.date.isToday()) "今天" else item.date.toChineseDayOfWeek()
-        binding.weatherText.text = item.dayWeatherText.toString()
-        binding.temp.text = "${item.tempMin}-${item.tempMax}°"
+        binding.week.text =
+            if (item.weather.date.parseToTimestamp(ZoneId.of(item.timeZone))
+                    .isToday(ZoneId.of(item.timeZone))
+            ) "今天"
+            else item.weather.date.parseToTimestamp(ZoneId.of(item.timeZone))
+                .toChineseDayOfWeek(ZoneId.of(item.timeZone))
+        binding.weatherText.text = item.weather.dayWeatherText.toString()
+        binding.temp.text = "${item.weather.tempMin}-${item.weather.tempMax}°"
     }
 
     inner class ViewHolder(val binding: ItemWeatherDailyBinding) :
@@ -47,17 +53,20 @@ class DailyWeatherListAdapter(val context: Context) :
 
     companion object {
         const val TAG = "DailyWeatherListAdapter"
-        private val diffCallback = object : DiffUtil.ItemCallback<DailyWeather>() {
+
+        data class DailyItem(val weather: DailyWeather, val timeZone: String)
+
+        private val diffCallback = object : DiffUtil.ItemCallback<DailyItem>() {
             override fun areItemsTheSame(
-                oldItem: DailyWeather,
-                newItem: DailyWeather
+                oldItem: DailyItem,
+                newItem: DailyItem
             ): Boolean {
-                return oldItem.date == newItem.date
+                return oldItem.weather.date == newItem.weather.date
             }
 
             override fun areContentsTheSame(
-                oldItem: DailyWeather,
-                newItem: DailyWeather
+                oldItem: DailyItem,
+                newItem: DailyItem
             ): Boolean {
                 return oldItem == newItem
             }

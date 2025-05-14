@@ -29,6 +29,15 @@
         android:id="@+id/citySearchFragment"
         android:name="com.lunacattus.app.presentation.features.weather.ui.page.CitySearchFragment"
         android:label="CitySearchFragment">
+        <action
+            android:id="@+id/action_citySearch_to_dialog_detail_dest"
+            app:destination="@id/dialog_detail_dest" />
     </fragment>
+
+    <dialog
+        android:id="@+id/dialog_detail_dest"
+        android:name="com.lunacattus.app.presentation.features.weather.ui.page.WeatherSearchDetailDialog"
+        android:label="dialog_detail"
+        tools:layout="@layout/dialog_search_detail" />
 
 </navigation>

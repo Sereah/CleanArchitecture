@@ -10,6 +10,7 @@ import com.lunacattus.app.domain.model.NowWeather
 import com.lunacattus.app.domain.model.Weather
 import com.lunacattus.app.domain.model.WeatherGeo
 import com.lunacattus.app.domain.repository.weather.IWeatherRepository
+import com.lunacattus.clean.common.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -163,11 +164,21 @@ class WeatherRepository @Inject constructor(
 
     override suspend fun updateSavedCityWeather(): Result<Unit> = withContext(Dispatchers.IO) {
         try {
-            weatherLocalDataSource.getGeo(false).forEach {
+            weatherLocalDataSource.queryGeo(false).forEach {
+                Logger.d(TAG, "updateSavedCityWeather: ${it.name}")
                 requestAndSaveWeather(it.locationId, false)
             }
             Result.success(Unit)
         } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun queryGeo(id: String): Result<WeatherGeo?> = withContext(Dispatchers.IO) {
+        try {
+            val geo = weatherLocalDataSource.queryGeo(id)
+            Result.success(geo?.mapperToModel())
+        }catch (e: Exception) {
             Result.failure(e)
         }
     }

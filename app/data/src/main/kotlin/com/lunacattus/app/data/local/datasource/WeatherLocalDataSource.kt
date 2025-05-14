@@ -15,7 +15,7 @@ class WeatherLocalDataSource @Inject constructor(
     private val weatherDao: WeatherDao
 ) {
     suspend fun insertWeatherGeo(geo: QWeatherGeoEntity) {
-        if (geo.isCurrentLocation && weatherDao.getGeo(true)[0].locationId != geo.locationId) {
+        if (geo.isCurrentLocation && weatherDao.queryGeo(true)[0].locationId != geo.locationId) {
             weatherDao.deleteOldLocationQWeatherGeo()
         }
         if (weatherDao.insertQWeatherGeo(geo) == 0L) {
@@ -54,7 +54,11 @@ class WeatherLocalDataSource @Inject constructor(
         return weatherDao.queryAllQWeather()
     }
 
-    suspend fun getGeo(isCurrentLocation: Boolean): List<QWeatherGeoEntity> {
-        return weatherDao.getGeo(isCurrentLocation)
+    suspend fun queryGeo(isCurrentLocation: Boolean): List<QWeatherGeoEntity> {
+        return weatherDao.queryGeo(isCurrentLocation)
+    }
+
+    suspend fun queryGeo(id: String): QWeatherGeoEntity? {
+        return weatherDao.queryGeo(id)
     }
 }

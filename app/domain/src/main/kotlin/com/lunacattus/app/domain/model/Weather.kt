@@ -21,7 +21,7 @@ data class WeatherGeo(
 
 data class NowWeather(
     val id: String = "",
-    val obsTime: Long = 0L,
+    val obsTime: String = "",
     val temp: Int = 0,
     val feelsLike: Int = 0,
     val weatherText: WeatherText = WeatherText.SUNNY,
@@ -39,11 +39,11 @@ data class NowWeather(
 
 data class DailyWeather(
     val id: String,
-    val date: Long,
-    val sunrise: Long,
-    val sunset: Long,
-    val moonrise: Long,
-    val moonSet: Long,
+    val date: String,
+    val sunrise: String,
+    val sunset: String,
+    val moonrise: String,
+    val moonSet: String,
     val moonPhase: String, //月相名称
     val tempMax: Int,
     val tempMin: Int,
@@ -66,7 +66,7 @@ data class DailyWeather(
 
 data class HourlyWeather(
     val id: String,
-    val time: Long,
+    val time: String,
     val temp: Int,
     val weatherText: WeatherText,
     val windDirection: WindDirection,

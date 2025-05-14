@@ -2,12 +2,15 @@ package com.lunacattus.app.presentation.features.weather.ui.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.lunacattus.app.domain.model.DailyWeather
+import com.lunacattus.app.presentation.features.weather.ui.adapter.WeatherPagerAdapter.Companion.TAG
+import com.lunacattus.clean.common.Logger
 import com.lunacattus.clean.presentation.databinding.ItemWeatherDailyBinding
 import com.lunacattus.common.isToday
 import com.lunacattus.common.toChineseDayOfWeek
@@ -43,6 +46,7 @@ class DailyWeatherListAdapter(val context: Context) :
         RecyclerView.ViewHolder(binding.root)
 
     companion object {
+        const val TAG = "DailyWeatherListAdapter"
         private val diffCallback = object : DiffUtil.ItemCallback<DailyWeather>() {
             override fun areItemsTheSame(
                 oldItem: DailyWeather,

@@ -40,7 +40,7 @@ class CityOptionFragment : BaseWeatherFragment<FragmentCityOptionBinding>(
                 if (index == 0) {
                     itemList.add(CityListItem.Title("当前定位"))
                 }
-                if (index == 2) {
+                if (index == 1) {
                     itemList.add(CityListItem.Title("已添加城市"))
                 }
                 itemList.add(CityListItem.City(weather))

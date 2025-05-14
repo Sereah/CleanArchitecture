@@ -2,9 +2,9 @@ package com.lunacattus.app.presentation.features.weather.ui.page
 
 import android.os.Bundle
 import android.view.WindowInsetsController
-import android.widget.ImageView
 import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.tabs.TabLayoutMediator
+import com.lunacattus.app.domain.model.Weather
+import com.lunacattus.app.domain.model.WeatherText
 import com.lunacattus.app.presentation.common.navigation.NavCommand
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState
 import com.lunacattus.app.presentation.features.weather.ui.adapter.WeatherPagerAdapter
@@ -16,6 +16,8 @@ class WeatherPagerFragment : BaseWeatherFragment<FragmentWeatherPagerBinding>(
     FragmentWeatherPagerBinding::inflate
 ) {
 
+    private lateinit var pagerAdapter: WeatherPagerAdapter
+
     override fun setupViews(savedInstanceState: Bundle?) {
         requireActivity().window.insetsController?.apply {
             setSystemBarsAppearance(
@@ -23,21 +25,8 @@ class WeatherPagerFragment : BaseWeatherFragment<FragmentWeatherPagerBinding>(
                 WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
             )
         }
-        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                for (i in 0 until binding.tabLayout.tabCount) {
-                    val tab = binding.tabLayout.getTabAt(i)
-                    val imageView = tab?.customView as? ImageView
-                    if (position == 0) {
-                        imageView?.setImageResource(R.drawable.ic_location_selected)
-                        imageView?.isSelected = false
-                    } else {
-                        imageView?.setImageResource(R.drawable.ic_location_unselected)
-                        imageView?.isSelected = position == i
-                    }
-                }
-            }
-        })
+        pagerAdapter = WeatherPagerAdapter()
+        binding.viewPager.adapter = pagerAdapter
         binding.menu.setOnClickListenerWithDebounce {
             navCoordinator().execute(
                 NavCommand.ToDirection(
@@ -45,24 +34,42 @@ class WeatherPagerFragment : BaseWeatherFragment<FragmentWeatherPagerBinding>(
                 )
             )
         }
+        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                val weather = pagerAdapter.currentList[position]
+//                Logger.d(TAG, "onPageSelected: $weather")
+                val bg =
+                    if (weather.dailyWeather.isNotEmpty() && weather.dailyWeather[0].sunset < System.currentTimeMillis()) {
+                        when (weather.nowWeather.weatherText) {
+                            WeatherText.SUNNY -> R.drawable.bg_sunny_weather
+                            WeatherText.FOGGY,
+                            WeatherText.WINDY,
+                            WeatherText.UNKNOWN,
+                            WeatherText.CLOUDY -> R.drawable.bg_cloudy_weather
+
+                            WeatherText.STORMY,
+                            WeatherText.SNOWY,
+                            WeatherText.THUNDERSTORM,
+                            WeatherText.RAINY -> R.drawable.bg_weather_rain
+                        }
+                    } else {
+                        R.drawable.bg_weather_night
+                    }
+                binding.root.setBackgroundResource(bg)
+            }
+        })
     }
 
     override fun setupObservers() {
-        collectState<WeatherUiState.Success.WeatherList, Int>(
-            mapFn = { it.weathers.size },
-            filterFn = { it != 0 }
+        collectState<WeatherUiState.Success.WeatherList, List<Weather>>(
+            mapFn = { it.weathers },
+            filterFn = { it.isNotEmpty() }
         ) {
-            binding.viewPager.adapter = WeatherPagerAdapter(this, it)
-            TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
-                val tabView = ImageView(requireContext()).apply {
-                    if (position == 0) {
-                        setImageResource(R.drawable.ic_location_selected)
-                    } else {
-                        setImageResource(R.drawable.ic_dot)
-                    }
-                }
-                tab.customView = tabView
-            }.attach()
+            pagerAdapter.submitList(it)
         }
+    }
+
+    companion object {
+        const val TAG = "WeatherPagerFragment"
     }
 }

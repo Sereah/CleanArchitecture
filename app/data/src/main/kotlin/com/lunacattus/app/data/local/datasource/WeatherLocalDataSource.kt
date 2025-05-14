@@ -15,30 +15,26 @@ class WeatherLocalDataSource @Inject constructor(
     private val weatherDao: WeatherDao
 ) {
     suspend fun insertWeatherGeo(geo: QWeatherGeoEntity) {
-        if (geo.isCurrentLocation) {
+        if (geo.isCurrentLocation && weatherDao.getGeo(true)[0].locationId != geo.locationId) {
             weatherDao.deleteOldLocationQWeatherGeo()
         }
-        weatherDao.insertQWeatherGeo(geo)
+        if (weatherDao.insertQWeatherGeo(geo) == 0L) {
+            weatherDao.updateQWeatherGeo(geo)
+        }
     }
 
     suspend fun insertNowWeather(now: QWeatherNowEntity) {
-        if (now.isCurrentLocation) {
-            weatherDao.deleteOldLocationQWeatherNow()
-        }
+        weatherDao.deleteOldLocationQWeatherNow(now.locationId)
         weatherDao.insertQWeatherNow(now)
     }
 
     suspend fun insertDailyWeather(daily: List<QWeatherDailyEntity>) {
-        if (daily.isNotEmpty() && daily[0].isCurrentLocation) {
-            weatherDao.deleteOldLocationQWeatherDaily()
-        }
+        weatherDao.deleteOldLocationQWeatherDaily(daily[0].locationId)
         weatherDao.insertQWeatherDaily(daily)
     }
 
     suspend fun insertHourlyWeather(hourly: List<QWeatherHourlyEntity>) {
-        if (hourly.isNotEmpty() && hourly[0].isCurrentLocation) {
-            weatherDao.deleteOldLocationQWeatherHourly()
-        }
+        weatherDao.deleteOldLocationQWeatherHourly(hourly[0].locationId)
         weatherDao.insertQWeatherHourly(hourly)
     }
 
@@ -56,5 +52,9 @@ class WeatherLocalDataSource @Inject constructor(
 
     fun queryAllWeather(): Flow<List<QWeatherEntity>> {
         return weatherDao.queryAllQWeather()
+    }
+
+    suspend fun getGeo(isCurrentLocation: Boolean): List<QWeatherGeoEntity> {
+        return weatherDao.getGeo(isCurrentLocation)
     }
 }

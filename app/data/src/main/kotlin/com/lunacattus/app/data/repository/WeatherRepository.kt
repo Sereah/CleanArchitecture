@@ -161,6 +161,17 @@ class WeatherRepository @Inject constructor(
         }
     }
 
+    override suspend fun updateSavedCityWeather(): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            weatherLocalDataSource.getGeo(false).forEach {
+                requestAndSaveWeather(it.locationId, false)
+            }
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
     companion object {
         const val TAG = "WeatherRepository"
         private const val Q_WEATHER_SUCCESS = 200

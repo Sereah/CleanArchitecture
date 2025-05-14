@@ -8,6 +8,7 @@ import com.lunacattus.app.domain.usecase.weather.GetNowWeatherUseCase
 import com.lunacattus.app.domain.usecase.weather.GetWeatherGeoListUseCase
 import com.lunacattus.app.domain.usecase.weather.QueryAllWeatherUseCase
 import com.lunacattus.app.domain.usecase.weather.RequestAndSaveWeatherUseCase
+import com.lunacattus.app.domain.usecase.weather.UpdateSavedCityWeatherUseCase
 import com.lunacattus.app.presentation.common.ui.base.BaseViewModel
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherSideEffect
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherSideEffect.ShowFailToast
@@ -31,6 +32,7 @@ import javax.inject.Inject
 class WeatherViewModel @Inject constructor(
     private val locationUseCase: GetLocationUseCase,
     private val requestAndSaveWeatherUseCase: RequestAndSaveWeatherUseCase,
+    private val updateSavedCityWeatherUseCase: UpdateSavedCityWeatherUseCase,
     private val queryAllWeatherUseCase: QueryAllWeatherUseCase,
     private val getWeatherGeoListUseCase: GetWeatherGeoListUseCase,
     private val getNowWeatherUseCase: GetNowWeatherUseCase,
@@ -42,6 +44,7 @@ class WeatherViewModel @Inject constructor(
         Logger.d(TAG, "init.")
         updateUiState { WeatherUiState.Loading }
         observeCurrentLocation()
+        updateCitiesWeather()
         observeAllWeather()
     }
 
@@ -49,7 +52,7 @@ class WeatherViewModel @Inject constructor(
 
     override fun processUiIntent(intent: WeatherUiIntent) {
         when (intent) {
-            is WeatherUiIntent.OnRequestSearchCity -> {
+            is WeatherUiIntent.SearchCity -> {
                 viewModelScope.launch {
                     getWeatherGeoListUseCase.invoke(intent.key).onSuccess { list ->
                         updateUiState { SearchGeoList(list) }
@@ -63,7 +66,7 @@ class WeatherViewModel @Inject constructor(
                 }
             }
 
-            is WeatherUiIntent.OnRequestGetSearchCityWeather -> {
+            is WeatherUiIntent.GetSearchCityWeather -> {
                 viewModelScope.launch {
                     sendSideEffect(ShowWeatherDetailPage(intent.geo))
                     getNowWeatherUseCase.invoke(intent.geo.id).onSuccess { now ->
@@ -96,9 +99,15 @@ class WeatherViewModel @Inject constructor(
                 }
             }
 
-            is WeatherUiIntent.AddCity -> {
+            is WeatherUiIntent.OnRequestAddCity -> {
                 viewModelScope.launch {
                     requestAndSaveWeatherUseCase.invoke(intent.id, false)
+                }
+            }
+
+            is WeatherUiIntent.OnRequestUpdateWeather -> {
+                viewModelScope.launch {
+                    requestAndSaveWeatherUseCase.invoke(intent.id, intent.isCurrentLocation)
                 }
             }
         }
@@ -136,13 +145,21 @@ class WeatherViewModel @Inject constructor(
         }
     }
 
+    private fun updateCitiesWeather() {
+        viewModelScope.launch {
+            updateSavedCityWeatherUseCase.invoke().onSuccess {
+                Logger.d(TAG, "updateCitiesWeather success.")
+            }
+        }
+    }
+
     private fun observeAllWeather() {
         viewModelScope.launch {
             queryAllWeatherUseCase.invoke().onSuccess { flow ->
                 flow.filter { it.isNotEmpty() }.distinctUntilChanged().collect { weather ->
                     Logger.d(TAG, "query all weather: ${weather.size}")
                     updateUiState {
-                        WeatherList(weather)
+                        WeatherList(weather.sortedWith(compareByDescending { it.geo.isCurrentLocation }))
                     }
                 }
             }.onFailure {

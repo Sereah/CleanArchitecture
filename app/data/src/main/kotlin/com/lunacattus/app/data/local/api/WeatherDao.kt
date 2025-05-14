@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.lunacattus.app.data.local.entity.QWeatherDailyEntity
 import com.lunacattus.app.data.local.entity.QWeatherEntity
 import com.lunacattus.app.data.local.entity.QWeatherGeoEntity
@@ -18,17 +19,20 @@ interface WeatherDao {
     @Query("DELETE FROM q_weather_geo WHERE isCurrentLocation = 1")
     suspend fun deleteOldLocationQWeatherGeo()
 
-    @Query("DELETE FROM q_weather_now WHERE isCurrentLocation = 1")
-    suspend fun deleteOldLocationQWeatherNow()
+    @Query("DELETE FROM q_weather_now WHERE locationId = :locationId")
+    suspend fun deleteOldLocationQWeatherNow(locationId: String)
 
-    @Query("DELETE FROM q_weather_daily WHERE isCurrentLocation = 1")
-    suspend fun deleteOldLocationQWeatherDaily()
+    @Query("DELETE FROM q_weather_daily WHERE locationId = :locationId")
+    suspend fun deleteOldLocationQWeatherDaily(locationId: String)
 
-    @Query("DELETE FROM q_weather_hourly WHERE isCurrentLocation = 1")
-    suspend fun deleteOldLocationQWeatherHourly()
+    @Query("DELETE FROM q_weather_hourly WHERE locationId = :locationId")
+    suspend fun deleteOldLocationQWeatherHourly(locationId: String)
 
-    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
-    suspend fun insertQWeatherGeo(geo: QWeatherGeoEntity)
+    @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)
+    suspend fun insertQWeatherGeo(geo: QWeatherGeoEntity): Long
+
+    @Update
+    suspend fun updateQWeatherGeo(geo: QWeatherGeoEntity)
 
     @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
     suspend fun insertQWeatherNow(now: QWeatherNowEntity)
@@ -51,4 +55,7 @@ interface WeatherDao {
     @Transaction
     @Query("SELECT * FROM q_weather_geo")
     fun queryAllQWeather(): Flow<List<QWeatherEntity>>
+
+    @Query("SELECT * FROM q_weather_geo WHERE isCurrentLocation = :isCurrentLocation")
+    suspend fun getGeo(isCurrentLocation: Boolean): List<QWeatherGeoEntity>
 }

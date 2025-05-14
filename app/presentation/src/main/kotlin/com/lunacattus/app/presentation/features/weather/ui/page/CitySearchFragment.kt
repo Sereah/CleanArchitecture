@@ -2,17 +2,15 @@ package com.lunacattus.app.presentation.features.weather.ui.page
 
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.navOptions
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.lunacattus.app.presentation.common.navigation.NavCommand
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherSideEffect
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherSideEffect.ShowWeatherDetailPage
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiIntent
-import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiIntent.OnRequestGetSearchCityWeather
+import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiIntent.GetSearchCityWeather
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState
 import com.lunacattus.app.presentation.features.weather.ui.adapter.SearchListAdapter
 import com.lunacattus.clean.common.Logger
-import com.lunacattus.clean.presentation.R
 import com.lunacattus.clean.presentation.databinding.FragmentCitySearchBinding
 import com.lunacattus.common.addTextChangeDebounceListener
 
@@ -27,10 +25,11 @@ class CitySearchFragment : BaseWeatherFragment<FragmentCitySearchBinding>(
             navCoordinator().execute(NavCommand.Back)
         }
         binding.searchEdit.addTextChangeDebounceListener(500, lifecycleScope) {
-            dispatchUiIntent(WeatherUiIntent.OnRequestSearchCity(it))
+            dispatchUiIntent(WeatherUiIntent.SearchCity(it))
         }
         searchAdapter = SearchListAdapter(requireContext()) {
-            dispatchUiIntent(OnRequestGetSearchCityWeather(it))
+//            dispatchUiIntent(GetSearchCityWeather(it))
+            dispatchUiIntent(WeatherUiIntent.OnRequestAddCity(it.id))
         }
         binding.searchList.apply {
             adapter = searchAdapter
@@ -53,20 +52,6 @@ class CitySearchFragment : BaseWeatherFragment<FragmentCitySearchBinding>(
                     putString("GEO_NAME", effect.geo.name)
                     putString("GEO_ID", effect.geo.id)
                 }
-                navCoordinator().execute(
-                    NavCommand.ToDirection(
-                        NavCommand.defaultNavDirection(R.id.action_citySearch_to_searchDetail, bundle),
-                        options = navOptions {
-                            anim {
-                                enter = R.anim.slide_in_bottom
-                                exit = R.anim.slide_out_top
-                                popEnter = R.anim.slide_in_top
-                                popExit = R.anim.slide_out_bottom
-                            }
-                            launchSingleTop = true
-                        }
-                    )
-                )
             }
 
             else -> {}

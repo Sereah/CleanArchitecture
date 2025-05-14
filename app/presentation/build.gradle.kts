@@ -48,6 +48,7 @@ android {
 
         debug {
             isMinifyEnabled = false
+            isDebuggable = true
             signingConfig = signingConfigs.findByName("keystore")
         }
     }
@@ -87,6 +88,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    debugImplementation(libs.leakcanary.android)
 
     implementation(project(":app:domain"))
     implementation(project(":app:data"))

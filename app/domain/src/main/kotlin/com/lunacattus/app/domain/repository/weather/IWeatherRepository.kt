@@ -17,4 +17,5 @@ interface IWeatherRepository {
     suspend fun getDailyWeather(locationId: String): Result<List<DailyWeather>>
     suspend fun getHourlyWeather(locationId: String): Result<List<HourlyWeather>>
     fun queryAllWeather(): Result<Flow<List<Weather>>>
+    suspend fun updateSavedCityWeather(): Result<Unit>
 }

@@ -33,7 +33,7 @@ class WeatherPagerFragment : BaseWeatherFragment<FragmentWeatherPagerBinding>(
         setStatusBarColor()
         initViewPager()
         binding.menu.setOnClickListenerWithDebounce {
-            navCoordinator().execute(
+            navCoordinator.execute(
                 NavCommand.ToDirection(
                     direction = NavCommand.defaultNavDirection(R.id.action_weatherPager_to_cityOption)
                 )

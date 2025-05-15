@@ -29,7 +29,7 @@ class CitySearchFragment : BaseWeatherFragment<FragmentCitySearchBinding>(
 
     override fun setupViews(savedInstanceState: Bundle?) {
         binding.cancel.setOnClickListener {
-            navCoordinator().execute(NavCommand.Up)
+            navCoordinator.execute(NavCommand.Up)
         }
         binding.searchEdit.addTextChangeDebounceListener(500, lifecycleScope) {
             dispatchUiIntent(WeatherUiIntent.SearchCity(it))
@@ -62,7 +62,7 @@ class CitySearchFragment : BaseWeatherFragment<FragmentCitySearchBinding>(
                     putString(GEO_ID, effect.geo.id)
                     putString(GEO_NAME, effect.geo.name)
                 }
-                navCoordinator().execute(
+                navCoordinator.execute(
                     NavCommand.ToDirection(
                         direction = defaultNavDirection(
                             R.id.action_citySearch_to_dialog_detail_dest,
@@ -76,7 +76,7 @@ class CitySearchFragment : BaseWeatherFragment<FragmentCitySearchBinding>(
             is WeatherSideEffect.BackToCityOptionPage -> {
                 lifecycleScope.launch {
                     delay(500)
-                    navCoordinator().execute(NavCommand.Up)
+                    navCoordinator.execute(NavCommand.Up)
                 }
             }
 

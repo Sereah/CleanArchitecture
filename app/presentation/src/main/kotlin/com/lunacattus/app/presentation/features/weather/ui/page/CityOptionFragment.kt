@@ -24,7 +24,7 @@ class CityOptionFragment : BaseWeatherFragment<FragmentCityOptionBinding>(
             requireContext().applicationContext,
             {
                 dispatchUiIntent(WeatherUiIntent.SelectCityPage(it))
-                navCoordinator().execute(NavCommand.Up)
+                navCoordinator.execute(NavCommand.Up)
             }, {
                 dispatchUiIntent(WeatherUiIntent.DeleteCity(it))
             })
@@ -34,7 +34,7 @@ class CityOptionFragment : BaseWeatherFragment<FragmentCityOptionBinding>(
             overScrollMode = View.OVER_SCROLL_NEVER
         }
         binding.searchView.setOnClickListener {
-            navCoordinator().execute(
+            navCoordinator.execute(
                 NavCommand.ToDirection(
                     direction = NavCommand.defaultNavDirection(R.id.action_cityOption_to_citySearch)
                 )

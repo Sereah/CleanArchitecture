@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.WindowInsetsController
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.GridLayoutManager
 import com.amap.api.maps.MapsInitializer
 import com.lunacattus.app.presentation.common.navigation.NavCommand
 import com.lunacattus.app.presentation.common.navigation.NavCommand.Companion.defaultNavDirection
@@ -25,14 +26,21 @@ class HomeFragment :
         FragmentHomeBinding::inflate
     ) {
 
+    private lateinit var featureAdapter: FeatureListAdapter
+
     override val viewModel: HomeViewModel by viewModels()
 
     override fun setupViews(savedInstanceState: Bundle?) {
         Logger.d(TAG, "onViewCreated")
         setStatusBarColor()
-        binding.btnFeatureChat.setOnClickListener {
-            checkLocationPermission()
+        featureAdapter = FeatureListAdapter { id ->
+            checkFeature(id)
         }
+        binding.featureList.apply {
+            adapter = featureAdapter
+            layoutManager = GridLayoutManager(requireContext(), 2)
+        }
+        initList()
     }
 
     override fun setupObservers() {
@@ -40,13 +48,13 @@ class HomeFragment :
     }
 
     override fun handleSideEffect(effect: HomeSideEffect) {
-        when (effect) {
-            HomeSideEffect.NavigateToWeatherFeature -> {
-                navCoordinator().execute(
-                    NavCommand.ToDirection(
-                        defaultNavDirection(R.id.action_home_to_weather)
-                    )
-                )
+
+    }
+
+    private fun checkFeature(id: String) {
+        when {
+            id == FEATURE_WEATHER -> {
+                checkLocationPermission()
             }
         }
     }
@@ -78,14 +86,19 @@ class HomeFragment :
                 if (allGranted) {
                     MapsInitializer.updatePrivacyShow(requireContext(), true, true)
                     MapsInitializer.updatePrivacyAgree(requireContext(), true)
-                    dispatchUiIntent(HomeUiIntent.OnFeatureChatRequested)
+                    navCoordinator.execute(
+                        NavCommand.ToDirection(
+                            defaultNavDirection(R.id.action_home_to_weather)
+                        )
+                    )
                 }
             }
     }
 
     private fun setStatusBarColor() {
         val isNightMode =
-            requireActivity().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+            requireActivity().resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK ==
+                    Configuration.UI_MODE_NIGHT_YES
         Logger.d(TAG, "isNightMode: $isNightMode")
         if (isNightMode) {
             requireActivity().window.insetsController?.apply {
@@ -104,8 +117,21 @@ class HomeFragment :
         }
     }
 
+    private fun initList() {
+        featureAdapter.submitList(
+            listOf(
+                FeatureListAdapter.Companion.FeatureItem(
+                    id = FEATURE_WEATHER,
+                    imgSource = R.drawable.bg_sunny_weather,
+                    desc = "天气App--数据来源: 和风天气"
+                )
+            )
+        )
+    }
+
     companion object {
         const val TAG = "HomeFragment"
+        const val FEATURE_WEATHER = "weather"
     }
 
 }

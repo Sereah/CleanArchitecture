@@ -18,10 +18,4 @@
     </fragment>
 
     <include app:graph="@navigation/weather_navigation" />
-
-    <dialog
-        android:id="@+id/dialog_message_confirm_dest"
-        android:name="com.lunacattus.app.presentation.common.ui.dialog.MessageConfirmDialog"
-        android:label="dialog_message_confirm"
-        tools:layout="@layout/dialog_message_confirm" />
 </navigation>

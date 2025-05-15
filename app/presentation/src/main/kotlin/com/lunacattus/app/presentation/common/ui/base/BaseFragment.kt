@@ -94,6 +94,13 @@ abstract class BaseFragment<
     protected abstract fun setupObservers()
     protected abstract fun handleSideEffect(effect: EFFECT)
 
+    protected val navCoordinator by lazy {
+        EntryPointAccessors.fromActivity(
+            requireActivity(),
+            NavCoordinatorEntryPoint::class.java
+        ).navCoordinator()
+    }
+
     data class FlowConfig<T, R>(
         val mapFn: (T) -> R,
         val filterFn: (R) -> Boolean = { true },
@@ -153,14 +160,6 @@ abstract class BaseFragment<
 
     protected fun dispatchUiIntent(intent: INTENT) {
         viewModel.handleUiIntent(intent)
-    }
-
-    protected fun navCoordinator(): NavCoordinator {
-        val entryPoint = EntryPointAccessors.fromActivity(
-            requireActivity(),
-            NavCoordinatorEntryPoint::class.java
-        )
-        return entryPoint.navCoordinator()
     }
 
     private fun observeSideEffect() {

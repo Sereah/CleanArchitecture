@@ -13,7 +13,7 @@
         android:height="5dp"
         android:gravity="center">
         <shape android:shape="oval">
-            <solid android:color="@drawable/selector_tab_dot" />
+            <solid android:color="@drawable/color_tab_dot" />
         </shape>
     </item>
 </layer-list>

@@ -5,7 +5,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.WindowInsetsController
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.amap.api.maps.MapsInitializer
 import com.lunacattus.app.presentation.common.navigation.NavCommand
 import com.lunacattus.app.presentation.common.navigation.NavCommand.Companion.defaultNavDirection
@@ -38,7 +38,7 @@ class HomeFragment :
         }
         binding.featureList.apply {
             adapter = featureAdapter
-            layoutManager = GridLayoutManager(requireContext(), 2)
+            layoutManager = LinearLayoutManager(requireContext() )
         }
         initList()
     }
@@ -121,9 +121,10 @@ class HomeFragment :
         featureAdapter.submitList(
             listOf(
                 FeatureListAdapter.Companion.FeatureItem(
-                    id = FEATURE_WEATHER,
-                    imgSource = R.drawable.bg_sunny_weather,
-                    desc = "天气App--数据来源: 和风天气"
+                    name = FEATURE_WEATHER,
+                    desc = "一个简单的天气应用，数据来源‘和风天气’和‘高德地图’。",
+                    imgSource = R.drawable.img_feature_weather,
+                    bgSource = R.drawable.bg_feature_weather
                 )
             )
         )
@@ -131,7 +132,7 @@ class HomeFragment :
 
     companion object {
         const val TAG = "HomeFragment"
-        const val FEATURE_WEATHER = "weather"
+        const val FEATURE_WEATHER = "猫の天气"
     }
 
 }

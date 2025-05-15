@@ -126,9 +126,9 @@ class WeatherViewModel @Inject constructor(
 
     private suspend fun deleteCity(id: String) {
         deleteCityUseCase.invoke(id).onSuccess {
-            Logger.d(TAG, "delete id: $id success.")
+            Logger.d(TAG, "delete name: $id success.")
         }.onFailure {
-            Logger.e(TAG, "delete id: $id fail, $it")
+            Logger.e(TAG, "delete name: $id fail, $it")
         }
     }
 

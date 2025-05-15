@@ -3,10 +3,8 @@ package com.lunacattus.app.presentation.features.weather.ui.page
 import android.os.Bundle
 import android.view.View
 import android.view.WindowInsetsController
-import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.lunacattus.app.domain.model.Weather
 import com.lunacattus.app.domain.model.WeatherText
@@ -85,32 +83,12 @@ class WeatherPagerFragment : BaseWeatherFragment<FragmentWeatherPagerBinding>(
         binding.viewPager.registerOnPageChangeCallback(pagerCallback)
         TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
             val tabView = TabWeatherPagerBinding.inflate(layoutInflater)
+            when (position) {
+                0 -> tabView.tabIcon.setImageResource(R.drawable.ic_location)
+                else -> tabView.tabIcon.setImageResource(R.drawable.ic_dot)
+            }
             tab.customView = tabView.root
         }.attach()
-        binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab?) {
-                tab?.customView?.findViewById<ImageView>(R.id.tab_icon)?.apply {
-                    if (tab.position == 0) {
-                        setImageResource(R.drawable.ic_location_selected)
-                    } else {
-                        setImageResource(R.drawable.ic_dot)
-                    }
-                }
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab?) {
-                tab?.customView?.findViewById<ImageView>(R.id.tab_icon)?.apply {
-                    if (tab.position == 0) {
-                        setImageResource(R.drawable.ic_location_unselected)
-                    } else {
-                        setImageResource(R.drawable.ic_dot)
-                    }
-                }
-            }
-
-            override fun onTabReselected(tab: TabLayout.Tab?) {}
-        })
-
     }
 
     private fun setBackGround(weather: Weather) {
@@ -124,7 +102,7 @@ class WeatherPagerFragment : BaseWeatherFragment<FragmentWeatherPagerBinding>(
             weather.dailyWeather[0].sunrise.parseToTimestamp(ZoneId.of(weather.geo.timeZone))
         val currentTime =
             ZonedDateTime.now(ZoneId.of(weather.geo.timeZone)).toInstant().toEpochMilli()
-        val bg = if (sunsetTime > currentTime && sunriseTime < currentTime) {
+        val bg = if (currentTime in (sunriseTime + 1)..<sunsetTime) {
             when (weather.nowWeather.weatherText) {
                 WeatherText.SUNNY -> R.drawable.bg_sunny_weather
                 WeatherText.FOGGY,

@@ -16,7 +16,7 @@ class FeatureListAdapter(val onItemClick: (String) -> Unit) :
                 oldItem: FeatureItem,
                 newItem: FeatureItem
             ): Boolean {
-                return oldItem.id == newItem.id
+                return oldItem.name == newItem.name
             }
 
             override fun areContentsTheSame(
@@ -42,10 +42,11 @@ class FeatureListAdapter(val onItemClick: (String) -> Unit) :
         position: Int
     ) {
         val item = getItem(position)
+        holder.binding.main.setBackgroundResource(item.bgSource)
         holder.binding.img.setImageResource(item.imgSource)
-        holder.binding.desc.text = item.desc
+        holder.binding.title.text = item.name
         holder.binding.root.setOnClickListenerWithDebounce {
-            onItemClick(item.id)
+            onItemClick(item.name)
         }
     }
 
@@ -54,9 +55,10 @@ class FeatureListAdapter(val onItemClick: (String) -> Unit) :
 
     companion object {
         data class FeatureItem(
-            val id: String,
+            val name: String,
+            val desc: String,
             val imgSource: Int,
-            val desc: String
+            val bgSource: Int
         )
     }
 }

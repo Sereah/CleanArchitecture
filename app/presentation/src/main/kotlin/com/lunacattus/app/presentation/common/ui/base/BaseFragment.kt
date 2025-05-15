@@ -13,6 +13,8 @@ import com.lunacattus.app.presentation.common.di.NavCoordinatorEntryPoint
 import com.lunacattus.app.presentation.common.navigation.NavCoordinator
 import com.lunacattus.clean.common.Logger
 import dagger.hilt.android.EntryPointAccessors
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
@@ -91,6 +93,38 @@ abstract class BaseFragment<
     protected abstract fun setupViews(savedInstanceState: Bundle?)
     protected abstract fun setupObservers()
     protected abstract fun handleSideEffect(effect: EFFECT)
+
+    data class FlowConfig<T, R>(
+        val mapFn: (T) -> R,
+        val filterFn: (R) -> Boolean = { true },
+        val distinctFn: (old: R, new: R) -> Boolean = { old, new -> old == new }
+    )
+
+    protected inline fun <reified T : STATE, A, B> collectCombined(
+        flowA: FlowConfig<T, A>,
+        flowB: FlowConfig<T, B>,
+        crossinline collectFn: (A, B) -> Unit
+    ) {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                val sharedFlow = viewModel.uiState.filterIsInstance<T>()
+
+                val processedFlowA = sharedFlow
+                    .map { flowA.mapFn(it) }
+                    .filter { flowA.filterFn(it) }
+                    .distinctUntilChanged(flowA.distinctFn)
+
+                val processedFlowB = sharedFlow
+                    .map { flowB.mapFn(it) }
+                    .filter { flowB.filterFn(it) }
+                    .distinctUntilChanged(flowB.distinctFn)
+
+                processedFlowA.combine(processedFlowB) { a, b ->
+                    collectFn(a, b)
+                }.collect()
+            }
+        }
+    }
 
     protected inline fun <reified T : STATE, R> collectState(
         crossinline mapFn: (T) -> R,

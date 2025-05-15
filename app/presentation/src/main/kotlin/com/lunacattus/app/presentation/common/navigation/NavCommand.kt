@@ -35,6 +35,6 @@ sealed class NavCommand {
         val options: NavOptions? = defaultNavOptions,
     ) : NavCommand()
 
-    data object Back : NavCommand()
+    data object Up : NavCommand()
 
 }

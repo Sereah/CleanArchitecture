@@ -1,8 +1,11 @@
 package com.lunacattus.app.presentation.features.weather.ui.page
 
 import android.os.Bundle
+import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.lunacattus.app.domain.model.Weather
 import com.lunacattus.app.presentation.common.navigation.NavCommand
+import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiIntent
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState
 import com.lunacattus.app.presentation.features.weather.ui.adapter.CityListAdapter
 import com.lunacattus.app.presentation.features.weather.ui.adapter.CityListAdapter.Companion.CityListItem
@@ -17,10 +20,18 @@ class CityOptionFragment : BaseWeatherFragment<FragmentCityOptionBinding>(
     private lateinit var cityAdapter: CityListAdapter
 
     override fun setupViews(savedInstanceState: Bundle?) {
-        cityAdapter = CityListAdapter(requireContext())
+        cityAdapter = CityListAdapter(
+            requireContext().applicationContext,
+            {
+                dispatchUiIntent(WeatherUiIntent.SelectCityPage(it))
+                navCoordinator().execute(NavCommand.Up)
+            }, {
+                dispatchUiIntent(WeatherUiIntent.DeleteCity(it))
+            })
         binding.cityList.apply {
             adapter = cityAdapter
             layoutManager = LinearLayoutManager(requireContext())
+            overScrollMode = View.OVER_SCROLL_NEVER
         }
         binding.searchView.setOnClickListener {
             navCoordinator().execute(
@@ -32,11 +43,13 @@ class CityOptionFragment : BaseWeatherFragment<FragmentCityOptionBinding>(
     }
 
     override fun setupObservers() {
-        collectState<WeatherUiState.Success.WeatherList>(
-            filterFn = { it.weathers.isNotEmpty() }
+        collectState<WeatherUiState.Success, List<Weather>>(
+            mapFn = { it.weatherList },
+            filterFn = { it.isNotEmpty() }
         ) {
+            Logger.d(TAG, "collect weather list.")
             val itemList = mutableListOf<CityListItem>()
-            for ((index, weather) in it.weathers.withIndex()) {
+            for ((index, weather) in it.withIndex()) {
                 if (index == 0) {
                     itemList.add(CityListItem.Title("当前定位"))
                 }

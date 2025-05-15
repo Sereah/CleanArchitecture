@@ -70,6 +70,7 @@ class WeatherRepository @Inject constructor(
             }
             Result.success(Unit)
         } catch (e: Exception) {
+            e.printStackTrace()
             Result.failure(e)
         }
     }
@@ -79,6 +80,7 @@ class WeatherRepository @Inject constructor(
             val query = weatherLocalDataSource.queryNowWeather(id)
             Result.success(query.map { it.mapperToModel() })
         } catch (e: Exception) {
+            e.printStackTrace()
             Result.failure(e)
         }
     }
@@ -88,6 +90,7 @@ class WeatherRepository @Inject constructor(
             val query = weatherLocalDataSource.queryDailyWeather(id)
             Result.success(query.map { it.map { it.mapperToModel() } })
         } catch (e: Exception) {
+            e.printStackTrace()
             Result.failure(e)
         }
     }
@@ -97,6 +100,7 @@ class WeatherRepository @Inject constructor(
             val query = weatherLocalDataSource.queryHourlyWeather(id)
             Result.success(query.map { it.map { it.mapperToModel() } })
         } catch (e: Exception) {
+            e.printStackTrace()
             Result.failure(e)
         }
     }
@@ -110,6 +114,7 @@ class WeatherRepository @Inject constructor(
                 }
                 Result.success(geo.mapperToModel(false))
             } catch (e: Exception) {
+                e.printStackTrace()
                 Result.failure(e)
             }
         }
@@ -123,6 +128,7 @@ class WeatherRepository @Inject constructor(
                 }
                 Result.success(now.mapperToModel(locationId, false))
             } catch (e: Exception) {
+                e.printStackTrace()
                 Result.failure(e)
             }
         }
@@ -136,6 +142,7 @@ class WeatherRepository @Inject constructor(
                 }
                 Result.success(daily.mapperToModel(locationId, false))
             } catch (e: Exception) {
+                e.printStackTrace()
                 Result.failure(e)
             }
         }
@@ -149,6 +156,7 @@ class WeatherRepository @Inject constructor(
                 }
                 Result.success(hourly.mapperToModel(locationId, false))
             } catch (e: Exception) {
+                e.printStackTrace()
                 Result.failure(e)
             }
         }
@@ -158,6 +166,7 @@ class WeatherRepository @Inject constructor(
             val query = weatherLocalDataSource.queryAllWeather()
             Result.success(query.map { it.map { it.mapperToModel() } })
         } catch (e: Exception) {
+            e.printStackTrace()
             Result.failure(e)
         }
     }
@@ -170,6 +179,7 @@ class WeatherRepository @Inject constructor(
             }
             Result.success(Unit)
         } catch (e: Exception) {
+            e.printStackTrace()
             Result.failure(e)
         }
     }
@@ -179,6 +189,17 @@ class WeatherRepository @Inject constructor(
             val geo = weatherLocalDataSource.queryGeo(id)
             Result.success(geo?.mapperToModel())
         }catch (e: Exception) {
+            e.printStackTrace()
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun deleteCity(id: String): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            weatherLocalDataSource.deleteWeatherById(id)
+            Result.success(Unit)
+        }catch (e: Exception) {
+            e.printStackTrace()
             Result.failure(e)
         }
     }

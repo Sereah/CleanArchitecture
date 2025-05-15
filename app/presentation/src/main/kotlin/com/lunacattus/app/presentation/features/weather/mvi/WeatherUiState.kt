@@ -11,14 +11,15 @@ sealed interface WeatherUiState : IUiState {
     data object Initial : WeatherUiState
     data object Loading : WeatherUiState
 
-    sealed interface Success : WeatherUiState {
-        data class WeatherList(val weathers: List<Weather>) : Success
-        data class SearchGeoList(val geo: List<WeatherGeo>) : Success
-        data class SearchNow(val now: NowWeather) : Success
-        data class SearchDaily(val daily: List<DailyWeather>) : Success
-        data class SearchHourly(val hourly: List<HourlyWeather>) : Success
-        data class QueryGeo(val geo: WeatherGeo?): Success
-    }
+    data class Success(
+        val weatherList: List<Weather> = emptyList(),
+        val searchGeoList: List<WeatherGeo> = emptyList(),
+        val searchNowWeather: NowWeather? = null,
+        val searchDailyWeather: List<DailyWeather> = emptyList(),
+        val searchHourlyWeather: List<HourlyWeather> = emptyList(),
+        val queryGeo: WeatherGeo? = null,
+        val selectedCityId: String = ""
+    ) : WeatherUiState
 
     data class Error(val msg: String) : WeatherUiState
 }

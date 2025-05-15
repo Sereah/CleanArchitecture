@@ -19,4 +19,5 @@ interface IWeatherRepository {
     fun queryAllWeather(): Result<Flow<List<Weather>>>
     suspend fun updateSavedCityWeather(): Result<Unit>
     suspend fun queryGeo(id: String): Result<WeatherGeo?>
+    suspend fun deleteCity(id: String): Result<Unit>
 }

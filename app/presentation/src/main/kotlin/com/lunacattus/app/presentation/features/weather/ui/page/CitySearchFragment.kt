@@ -3,12 +3,13 @@ package com.lunacattus.app.presentation.features.weather.ui.page
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.lunacattus.app.domain.model.WeatherGeo
 import com.lunacattus.app.presentation.common.navigation.NavCommand
 import com.lunacattus.app.presentation.common.navigation.NavCommand.Companion.defaultNavDirection
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherSideEffect
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherSideEffect.ShowWeatherDetailPage
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiIntent
-import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiIntent.GetSearchCityWeather
+import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiIntent.SearchCityWeather
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState
 import com.lunacattus.app.presentation.features.weather.ui.adapter.SearchListAdapter
 import com.lunacattus.app.presentation.features.weather.ui.page.WeatherSearchDetailDialog.Companion.GEO_ID
@@ -28,13 +29,13 @@ class CitySearchFragment : BaseWeatherFragment<FragmentCitySearchBinding>(
 
     override fun setupViews(savedInstanceState: Bundle?) {
         binding.cancel.setOnClickListener {
-            navCoordinator().execute(NavCommand.Back)
+            navCoordinator().execute(NavCommand.Up)
         }
         binding.searchEdit.addTextChangeDebounceListener(500, lifecycleScope) {
             dispatchUiIntent(WeatherUiIntent.SearchCity(it))
         }
         searchAdapter = SearchListAdapter(requireContext()) {
-            dispatchUiIntent(GetSearchCityWeather(it))
+            dispatchUiIntent(SearchCityWeather(it))
         }
         binding.searchList.apply {
             adapter = searchAdapter
@@ -43,9 +44,12 @@ class CitySearchFragment : BaseWeatherFragment<FragmentCitySearchBinding>(
     }
 
     override fun setupObservers() {
-        collectState<WeatherUiState.Success.SearchGeoList> {
-            Logger.d(TAG, "collect geo list: ${it.geo}")
-            searchAdapter.submitList(it.geo)
+        collectState<WeatherUiState.Success, List<WeatherGeo>>(
+            mapFn = {it.searchGeoList},
+            filterFn = {it.isNotEmpty()}
+        ) {
+            Logger.d(TAG, "collect geo list: $it")
+            searchAdapter.submitList(it)
         }
     }
 
@@ -72,7 +76,7 @@ class CitySearchFragment : BaseWeatherFragment<FragmentCitySearchBinding>(
             is WeatherSideEffect.BackToCityOptionPage -> {
                 lifecycleScope.launch {
                     delay(500)
-                    navCoordinator().execute(NavCommand.Back)
+                    navCoordinator().execute(NavCommand.Up)
                 }
             }
 

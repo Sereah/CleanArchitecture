@@ -1,17 +1,27 @@
 package com.lunacattus.app.presentation.features.weather.ui.page
 
 import android.os.Bundle
+import android.view.View
 import android.view.WindowInsetsController
+import android.widget.ImageView
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import com.lunacattus.app.domain.model.Weather
 import com.lunacattus.app.domain.model.WeatherText
 import com.lunacattus.app.presentation.common.navigation.NavCommand
+import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiIntent
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState
 import com.lunacattus.app.presentation.features.weather.ui.adapter.WeatherPagerAdapter
 import com.lunacattus.clean.common.Logger
 import com.lunacattus.clean.presentation.R
 import com.lunacattus.clean.presentation.databinding.FragmentWeatherPagerBinding
+import com.lunacattus.clean.presentation.databinding.TabWeatherPagerBinding
+import com.lunacattus.common.parseToTimestamp
 import com.lunacattus.common.setOnClickListenerWithDebounce
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 class WeatherPagerFragment : BaseWeatherFragment<FragmentWeatherPagerBinding>(
     FragmentWeatherPagerBinding::inflate
@@ -20,14 +30,8 @@ class WeatherPagerFragment : BaseWeatherFragment<FragmentWeatherPagerBinding>(
     private lateinit var pagerAdapter: WeatherPagerAdapter
 
     override fun setupViews(savedInstanceState: Bundle?) {
-        requireActivity().window.insetsController?.apply {
-            setSystemBarsAppearance(
-                0,
-                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
-            )
-        }
-        pagerAdapter = WeatherPagerAdapter()
-        binding.viewPager.adapter = pagerAdapter
+        setStatusBarColor()
+        initViewPager()
         binding.menu.setOnClickListenerWithDebounce {
             navCoordinator().execute(
                 NavCommand.ToDirection(
@@ -35,40 +39,115 @@ class WeatherPagerFragment : BaseWeatherFragment<FragmentWeatherPagerBinding>(
                 )
             )
         }
-        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                val weather = pagerAdapter.currentList[position]
-//                Logger.d(TAG, "onPageSelected: $weather")
-                val bg =
-                    if (weather.dailyWeather.isNotEmpty() && weather.dailyWeather[0].sunset > weather.nowWeather.obsTime) {
-                        when (weather.nowWeather.weatherText) {
-                            WeatherText.SUNNY -> R.drawable.bg_sunny_weather
-                            WeatherText.FOGGY,
-                            WeatherText.WINDY,
-                            WeatherText.UNKNOWN,
-                            WeatherText.CLOUDY -> R.drawable.bg_cloudy_weather
-
-                            WeatherText.STORMY,
-                            WeatherText.SNOWY,
-                            WeatherText.THUNDERSTORM,
-                            WeatherText.RAINY -> R.drawable.bg_weather_rain
-                        }
-                    } else {
-                        R.drawable.bg_weather_night
-                    }
-                binding.root.setBackgroundResource(bg)
-            }
-        })
     }
 
     override fun setupObservers() {
-        collectState<WeatherUiState.Success.WeatherList, List<Weather>>(
-            mapFn = { it.weathers },
+        collectState<WeatherUiState.Success, List<Weather>>(
+            mapFn = { it.weatherList },
             filterFn = { it.isNotEmpty() },
         ) {
-            Logger.d(TAG, "collect weather list, size=${it.size}")
-            Logger.d(TAG, "collect weather: ${it[0].nowWeather}")
+            Logger.d(TAG, "collect weatherList, size=${it.size}")
             pagerAdapter.submitList(it)
+        }
+        collectState<WeatherUiState.Success, String>(
+            mapFn = { it.selectedCityId },
+            filterFn = { it.isNotEmpty() }
+        ) { id ->
+            Logger.d(TAG, "collect selectedCityId: $id")
+            val index = pagerAdapter.currentList.indexOfFirst { it.geo.id == id }
+            if (binding.viewPager.currentItem != index) {
+                binding.viewPager.setCurrentItem(index, false)
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        binding.viewPager.unregisterOnPageChangeCallback(pagerCallback)
+        binding.viewPager.adapter = null
+        super.onDestroyView()
+    }
+
+    private fun setStatusBarColor() {
+        requireActivity().window.insetsController?.apply {
+            setSystemBarsAppearance(
+                0,
+                WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+            )
+        }
+    }
+
+    private fun initViewPager() {
+        (binding.viewPager.getChildAt(0) as RecyclerView).apply {
+            overScrollMode = View.OVER_SCROLL_NEVER
+        }
+        pagerAdapter = WeatherPagerAdapter()
+        binding.viewPager.adapter = pagerAdapter
+        binding.viewPager.registerOnPageChangeCallback(pagerCallback)
+        TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
+            val tabView = TabWeatherPagerBinding.inflate(layoutInflater)
+            tab.customView = tabView.root
+        }.attach()
+        binding.tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
+                tab?.customView?.findViewById<ImageView>(R.id.tab_icon)?.apply {
+                    if (tab.position == 0) {
+                        setImageResource(R.drawable.ic_location_selected)
+                    } else {
+                        setImageResource(R.drawable.ic_dot)
+                    }
+                }
+            }
+
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
+                tab?.customView?.findViewById<ImageView>(R.id.tab_icon)?.apply {
+                    if (tab.position == 0) {
+                        setImageResource(R.drawable.ic_location_unselected)
+                    } else {
+                        setImageResource(R.drawable.ic_dot)
+                    }
+                }
+            }
+
+            override fun onTabReselected(tab: TabLayout.Tab?) {}
+        })
+
+    }
+
+    private fun setBackGround(weather: Weather) {
+        if (weather.dailyWeather.isEmpty()) {
+            binding.root.setBackgroundResource(R.drawable.bg_cloudy_weather)
+            return
+        }
+        val sunsetTime =
+            weather.dailyWeather[0].sunset.parseToTimestamp(ZoneId.of(weather.geo.timeZone))
+        val sunriseTime =
+            weather.dailyWeather[0].sunrise.parseToTimestamp(ZoneId.of(weather.geo.timeZone))
+        val currentTime =
+            ZonedDateTime.now(ZoneId.of(weather.geo.timeZone)).toInstant().toEpochMilli()
+        val bg = if (sunsetTime > currentTime && sunriseTime < currentTime) {
+            when (weather.nowWeather.weatherText) {
+                WeatherText.SUNNY -> R.drawable.bg_sunny_weather
+                WeatherText.FOGGY,
+                WeatherText.WINDY,
+                WeatherText.UNKNOWN,
+                WeatherText.CLOUDY -> R.drawable.bg_cloudy_weather
+
+                WeatherText.STORMY,
+                WeatherText.SNOWY,
+                WeatherText.THUNDERSTORM,
+                WeatherText.RAINY -> R.drawable.bg_weather_rain
+            }
+        } else {
+            R.drawable.bg_weather_night
+        }
+        binding.root.setBackgroundResource(bg)
+    }
+
+    private val pagerCallback = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            val weather = pagerAdapter.currentList[position]
+            dispatchUiIntent(WeatherUiIntent.SelectCityPage(weather.geo.id))
+            setBackGround(weather)
         }
     }
 

@@ -2,11 +2,13 @@ package com.lunacattus.app.presentation.features.weather.ui.adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.OnItemTouchListener
 import com.lunacattus.app.domain.model.Weather
 import com.lunacattus.app.presentation.common.ui.UniformItemDecoration
 import com.lunacattus.clean.presentation.databinding.WidgetWeatherDetailBinding
@@ -84,6 +86,25 @@ class WeatherPagerAdapter :
                         itemHigh = 80.dpToPx(context)
                     )
                 )
+                addOnItemTouchListener(object : OnItemTouchListener {
+                    override fun onInterceptTouchEvent(
+                        rv: RecyclerView,
+                        e: MotionEvent
+                    ): Boolean {
+                        if (e.action == MotionEvent.ACTION_DOWN) {
+                            rv.parent.requestDisallowInterceptTouchEvent(true)
+                        }
+                        return false
+                    }
+
+                    override fun onTouchEvent(
+                        rv: RecyclerView,
+                        e: MotionEvent
+                    ) {}
+
+                    override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
+
+                })
             }
             binding.dailyList.apply {
                 adapter = dailyAdapter

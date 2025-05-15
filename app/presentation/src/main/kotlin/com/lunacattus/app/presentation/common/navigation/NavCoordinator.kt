@@ -15,7 +15,7 @@ class NavCoordinator @Inject constructor(
                 mainNavController.navigate(command.direction, command.options)
             }
 
-            NavCommand.Back -> {
+            NavCommand.Up -> {
                 mainNavController.navigateUp()
             }
         }

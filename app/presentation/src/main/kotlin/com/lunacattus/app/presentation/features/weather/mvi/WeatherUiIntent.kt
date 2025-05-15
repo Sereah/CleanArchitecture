@@ -5,7 +5,9 @@ import com.lunacattus.app.presentation.common.ui.base.IUiIntent
 
 sealed interface WeatherUiIntent : IUiIntent {
     data class SearchCity(val key: String) : WeatherUiIntent
-    data class GetSearchCityWeather(val geo: WeatherGeo) : WeatherUiIntent
-    data class OnRequestAddCity(val id: String): WeatherUiIntent
-    data class QueryGeoById(val id: String): WeatherUiIntent
+    data class SearchCityWeather(val geo: WeatherGeo) : WeatherUiIntent
+    data class AddCity(val id: String) : WeatherUiIntent
+    data class QueryCity(val id: String) : WeatherUiIntent
+    data class DeleteCity(val id: String) : WeatherUiIntent
+    data class SelectCityPage(val id: String) : WeatherUiIntent
 }

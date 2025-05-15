@@ -17,16 +17,19 @@ import kotlinx.coroutines.flow.Flow
 interface WeatherDao {
 
     @Query("DELETE FROM q_weather_geo WHERE isCurrentLocation = 1")
-    suspend fun deleteOldLocationQWeatherGeo()
+    suspend fun deleteCurrentLocationQWeatherGeo()
+
+    @Query("DELETE FROM q_weather_geo WHERE locationId = :locationId")
+    suspend fun deleteQWeatherGeo(locationId: String)
 
     @Query("DELETE FROM q_weather_now WHERE locationId = :locationId")
-    suspend fun deleteOldLocationQWeatherNow(locationId: String)
+    suspend fun deleteQWeatherNow(locationId: String)
 
     @Query("DELETE FROM q_weather_daily WHERE locationId = :locationId")
-    suspend fun deleteOldLocationQWeatherDaily(locationId: String)
+    suspend fun deleteQWeatherDaily(locationId: String)
 
     @Query("DELETE FROM q_weather_hourly WHERE locationId = :locationId")
-    suspend fun deleteOldLocationQWeatherHourly(locationId: String)
+    suspend fun deleteQWeatherHourly(locationId: String)
 
     @Insert(onConflict = OnConflictStrategy.Companion.IGNORE)
     suspend fun insertQWeatherGeo(geo: QWeatherGeoEntity): Long

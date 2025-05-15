@@ -13,13 +13,20 @@
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="50dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tabBackground="@android:color/transparent"
-        app:tabIndicator="@drawable/ic_dot"
+        app:tabIndicator="@null"
         app:tabIndicatorHeight="0dp"
+        app:tabIndicatorColor="@android:color/transparent"
+        app:tabPaddingEnd="3dp"
+        app:tabPaddingStart="2dp"
         app:tabRippleColor="@android:color/transparent" />
 
     <ImageView

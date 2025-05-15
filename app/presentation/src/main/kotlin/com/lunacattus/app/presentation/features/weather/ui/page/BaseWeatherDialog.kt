@@ -18,14 +18,4 @@ abstract class BaseWeatherDialog<VB : ViewBinding>(inflateBinding: (LayoutInflat
     ) {
 
     override val viewModel: WeatherViewModel by hiltNavGraphViewModels(R.id.weather_navigation)
-
-    override fun handleSideEffect(effect: WeatherSideEffect) {
-        when (effect) {
-            is WeatherSideEffect.ShowFailToast -> {
-                Toast.makeText(requireContext(), effect.msg, Toast.LENGTH_LONG).show()
-            }
-
-            else -> {}
-        }
-    }
 }

@@ -8,5 +8,6 @@
 
     <style name="Theme.MyArchitecture" parent="Base.Theme.MyArchitecture">
         <item name="android:windowSplashScreenAnimatedIcon">@drawable/logo</item>
+        <item name="android:fontFamily">@font/chinese</item>
     </style>
 </resources>

@@ -1,5 +1,19 @@
 package com.lunacattus.app.domain.model
 
+import com.lunacattus.clean.domain.R
+import com.lunacattus.common.parseToTimestamp
+import java.time.ZoneId
+
+
+fun Weather.isDay(currentTime: Long): Boolean {
+    if (this.dailyWeather.isEmpty()) return true
+    val sunsetTime =
+        this.dailyWeather[0].sunset.parseToTimestamp(ZoneId.of(this.geo.timeZone))
+    val sunriseTime =
+        this.dailyWeather[0].sunrise.parseToTimestamp(ZoneId.of(this.geo.timeZone))
+    return (currentTime in (sunriseTime + 1)..<sunsetTime)
+}
+
 data class Weather(
     val geo: WeatherGeo,
     val nowWeather: NowWeather,
@@ -86,7 +100,8 @@ enum class WeatherText(
     private val matches: List<String>
 ) {
     SUNNY("晴", listOf("晴", "阳光")),
-    CLOUDY("多云", listOf("多云", "阴")),
+    CLOUDY("多云", listOf("多云")),
+    OVERCAST("阴", listOf("阴")),
     RAINY("雨", listOf("雨", "小雨", "中雨", "大雨")),
     STORMY("暴雨", listOf("暴雨", "大暴雨", "特大暴雨")),
     SNOWY("雪", listOf("雪", "小雪", "中雪", "大雪", "暴雪")),

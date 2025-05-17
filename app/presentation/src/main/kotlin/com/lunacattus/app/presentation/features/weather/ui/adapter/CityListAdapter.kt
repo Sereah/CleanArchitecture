@@ -10,11 +10,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.lunacattus.app.domain.model.Weather
+import com.lunacattus.app.domain.model.isDay
 import com.lunacattus.clean.common.Logger
 import com.lunacattus.clean.presentation.R
 import com.lunacattus.clean.presentation.databinding.ItemTextViewBinding
 import com.lunacattus.clean.presentation.databinding.ItemWeatherCityBinding
-import com.lunacattus.common.parseToTimestamp
 import com.lunacattus.common.setOnClickListenerWithDebounce
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -116,21 +116,17 @@ class CityListAdapter(
                 item.weather.dailyWeather.takeIf { it.isNotEmpty() }?.let {
                     holder.binding.maxTemp.text = "${it[0].tempMax}°"
                     holder.binding.minTemp.text = "${it[0].tempMin}°"
-                    val currentTime =
+                }
+                val bg = if (item.weather.isDay(
                         ZonedDateTime.now(ZoneId.of(item.weather.geo.timeZone)).toInstant()
                             .toEpochMilli()
-                    val sunsetTime =
-                        it[0].sunset.parseToTimestamp(ZoneId.of(item.weather.geo.timeZone))
-                    val sunriseTime =
-                        it[0].sunrise.parseToTimestamp(ZoneId.of(item.weather.geo.timeZone))
-                    val bg =
-                        if (currentTime < sunsetTime && currentTime > sunriseTime) {
-                            R.drawable.bg_weather_item_day
-                        } else {
-                            R.drawable.bg_weather_item_night
-                        }
-                    holder.binding.bg.setBackgroundResource(bg)
+                    )
+                ) {
+                    R.drawable.bg_weather_item_day
+                } else {
+                    R.drawable.bg_weather_item_night
                 }
+                holder.binding.bg.setBackgroundResource(bg)
                 holder.binding.bg.setOnLongClickListener {
                     if (!item.weather.geo.isCurrentLocation) {
                         holder.binding.delete.visibility = View.VISIBLE

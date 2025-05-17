@@ -3,11 +3,14 @@ package com.lunacattus.app.presentation.features.weather.ui.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.lunacattus.app.domain.model.DailyWeather
+import com.lunacattus.app.domain.model.WeatherText
+import com.lunacattus.app.presentation.features.weather.ui.page.iconSource
 import com.lunacattus.clean.presentation.databinding.ItemWeatherDailyBinding
 import com.lunacattus.common.isToday
 import com.lunacattus.common.parseToTimestamp
@@ -44,7 +47,19 @@ class DailyWeatherListAdapter(val context: Context) :
             ) "今天"
             else item.weather.date.parseToTimestamp(ZoneId.of(item.timeZone))
                 .toChineseDayOfWeek(ZoneId.of(item.timeZone))
-        binding.weatherText.text = item.weather.dayWeatherText.toString()
+        if (item.weather.dayWeatherText == WeatherText.UNKNOWN) {
+            binding.weatherText.apply {
+                text = item.weather.dayWeatherText.toString()
+                visibility = View.VISIBLE
+            }
+            binding.icon.visibility = View.GONE
+        } else {
+            binding.icon.apply {
+                setImageResource(item.weather.dayWeatherText.iconSource(true))
+                visibility = View.VISIBLE
+            }
+            binding.weatherText.visibility = View.GONE
+        }
         binding.temp.text = "${item.weather.tempMin}-${item.weather.tempMax}°"
     }
 

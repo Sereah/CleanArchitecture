@@ -8,6 +8,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayoutMediator
 import com.lunacattus.app.domain.model.Weather
 import com.lunacattus.app.domain.model.WeatherText
+import com.lunacattus.app.domain.model.isDay
 import com.lunacattus.app.presentation.common.navigation.NavCommand
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiIntent
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiState
@@ -16,7 +17,6 @@ import com.lunacattus.clean.common.Logger
 import com.lunacattus.clean.presentation.R
 import com.lunacattus.clean.presentation.databinding.FragmentWeatherPagerBinding
 import com.lunacattus.clean.presentation.databinding.TabWeatherPagerBinding
-import com.lunacattus.common.parseToTimestamp
 import com.lunacattus.common.setOnClickListenerWithDebounce
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -92,22 +92,16 @@ class WeatherPagerFragment : BaseWeatherFragment<FragmentWeatherPagerBinding>(
     }
 
     private fun setBackGround(weather: Weather) {
-        if (weather.dailyWeather.isEmpty()) {
-            binding.root.setBackgroundResource(R.drawable.bg_cloudy_weather)
-            return
-        }
-        val sunsetTime =
-            weather.dailyWeather[0].sunset.parseToTimestamp(ZoneId.of(weather.geo.timeZone))
-        val sunriseTime =
-            weather.dailyWeather[0].sunrise.parseToTimestamp(ZoneId.of(weather.geo.timeZone))
-        val currentTime =
-            ZonedDateTime.now(ZoneId.of(weather.geo.timeZone)).toInstant().toEpochMilli()
-        val bg = if (currentTime in (sunriseTime + 1)..<sunsetTime) {
+        val bg = if (weather.isDay(
+                ZonedDateTime.now(ZoneId.of(weather.geo.timeZone)).toInstant().toEpochMilli()
+            )
+        ) {
             when (weather.nowWeather.weatherText) {
                 WeatherText.SUNNY -> R.drawable.bg_sunny_weather
                 WeatherText.FOGGY,
                 WeatherText.WINDY,
                 WeatherText.UNKNOWN,
+                WeatherText.OVERCAST,
                 WeatherText.CLOUDY -> R.drawable.bg_cloudy_weather
 
                 WeatherText.STORMY,

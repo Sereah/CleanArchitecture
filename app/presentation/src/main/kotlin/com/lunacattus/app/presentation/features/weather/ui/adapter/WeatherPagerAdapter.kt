@@ -10,9 +10,13 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnItemTouchListener
 import com.lunacattus.app.domain.model.Weather
+import com.lunacattus.app.domain.model.isDay
 import com.lunacattus.app.presentation.common.ui.UniformItemDecoration
+import com.lunacattus.clean.common.Logger
 import com.lunacattus.clean.presentation.databinding.WidgetWeatherDetailBinding
 import com.lunacattus.common.dpToPx
+import com.lunacattus.common.parseToTimestamp
+import java.time.ZoneId
 
 class WeatherPagerAdapter :
     ListAdapter<Weather, WeatherPagerAdapter.WeatherPagerViewHolder>(object :
@@ -60,7 +64,11 @@ class WeatherPagerAdapter :
         }
         binding.weatherText.text = weather.nowWeather.weatherText.toString()
         holder.hourlyAdapter.submitList(weather.hourlyWeather.map {
-            HourlyWeatherListAdapter.Companion.HourlyItem(it, weather.geo.timeZone)
+            HourlyWeatherListAdapter.Companion.HourlyItem(
+                it, weather.geo.timeZone, weather.isDay(
+                    it.time.substring(11, 16).parseToTimestamp(ZoneId.of(weather.geo.timeZone))
+                )
+            )
         })
         holder.dailyAdapter.submitList(weather.dailyWeather.map {
             DailyWeatherListAdapter.Companion.DailyItem(it, weather.geo.timeZone)
@@ -100,7 +108,8 @@ class WeatherPagerAdapter :
                     override fun onTouchEvent(
                         rv: RecyclerView,
                         e: MotionEvent
-                    ) {}
+                    ) {
+                    }
 
                     override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
 

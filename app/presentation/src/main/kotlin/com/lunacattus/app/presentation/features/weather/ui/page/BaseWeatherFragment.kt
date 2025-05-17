@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.hilt.navigation.fragment.hiltNavGraphViewModels
 import androidx.viewbinding.ViewBinding
+import com.lunacattus.app.domain.model.WeatherText
 import com.lunacattus.app.presentation.common.ui.base.BaseFragment
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherSideEffect
 import com.lunacattus.app.presentation.features.weather.mvi.WeatherUiIntent
@@ -26,5 +27,20 @@ abstract class BaseWeatherFragment<VB : ViewBinding>(inflateBinding: (LayoutInfl
             }
             else -> {}
         }
+    }
+}
+
+fun WeatherText.iconSource(isDay: Boolean): Int {
+    return when (this) {
+        WeatherText.SUNNY -> if (isDay) R.drawable.ic_weather_sunny_day else R.drawable.ic_weather_sunny_night
+        WeatherText.CLOUDY -> if (isDay) R.drawable.ic_weather_cloudy_day else R.drawable.ic_weather_cloudy_night
+        WeatherText.OVERCAST -> R.drawable.ic_weather_overcast
+        WeatherText.RAINY -> R.drawable.ic_weather_rainy
+        WeatherText.STORMY -> R.drawable.ic_weather_stormy
+        WeatherText.SNOWY -> R.drawable.ic_weather_snowy
+        WeatherText.THUNDERSTORM -> R.drawable.ic_weather_thunderstorm
+        WeatherText.FOGGY -> R.drawable.ic_weather_foggy
+        WeatherText.WINDY -> R.drawable.ic_weather_windy
+        WeatherText.UNKNOWN -> R.drawable.ic_weather_unknown
     }
 }

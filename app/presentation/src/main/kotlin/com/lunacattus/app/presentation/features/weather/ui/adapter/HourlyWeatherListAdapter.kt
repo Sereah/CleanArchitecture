@@ -3,11 +3,15 @@ package com.lunacattus.app.presentation.features.weather.ui.adapter
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.lunacattus.app.domain.model.HourlyWeather
+import com.lunacattus.app.domain.model.Weather
+import com.lunacattus.app.domain.model.WeatherText
+import com.lunacattus.app.presentation.features.weather.ui.page.iconSource
 import com.lunacattus.clean.presentation.databinding.ItemWeatherHourlyBinding
 import com.lunacattus.common.parseToTimestamp
 import com.lunacattus.common.toFormattedDateTime
@@ -55,7 +59,19 @@ class HourlyWeatherListAdapter(val context: Context) :
                 item.weather.time.parseToTimestamp(ZoneId.of(item.timeZone))
                     .toFormattedDateTime("HH", ZoneId.of(item.timeZone))
             }点"
-        binding.weatherText.text = item.weather.weatherText.toString()
+        if (item.weather.weatherText == WeatherText.UNKNOWN) {
+            binding.weatherText.apply {
+                text = item.weather.weatherText.toString()
+                visibility = View.VISIBLE
+            }
+            binding.icon.visibility = View.GONE
+        } else {
+            binding.icon.apply {
+                setImageResource(item.weather.weatherText.iconSource(item.isDay))
+                visibility = View.VISIBLE
+            }
+            binding.weatherText.visibility = View.GONE
+        }
         binding.temp.text = "${item.weather.temp}°"
     }
 
@@ -63,6 +79,10 @@ class HourlyWeatherListAdapter(val context: Context) :
         RecyclerView.ViewHolder(binding.root)
 
     companion object {
-        data class HourlyItem(val weather: HourlyWeather, val timeZone: String)
+        data class HourlyItem(
+            val weather: HourlyWeather,
+            val timeZone: String,
+            val isDay: Boolean
+        )
     }
 }

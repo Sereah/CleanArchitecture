@@ -42,6 +42,11 @@ class CityOptionFragment : BaseWeatherFragment<FragmentCityOptionBinding>(
         }
     }
 
+    override fun onDestroyView() {
+        binding.cityList.adapter = null
+        super.onDestroyView()
+    }
+
     override fun setupObservers() {
         collectState<WeatherUiState.Success, List<Weather>>(
             mapFn = { it.weatherList },

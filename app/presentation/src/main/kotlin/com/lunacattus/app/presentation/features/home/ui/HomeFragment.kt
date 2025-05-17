@@ -43,6 +43,11 @@ class HomeFragment :
         initList()
     }
 
+    override fun onDestroyView() {
+        binding.featureList.adapter = null
+        super.onDestroyView()
+    }
+
     override fun setupObservers() {
 
     }

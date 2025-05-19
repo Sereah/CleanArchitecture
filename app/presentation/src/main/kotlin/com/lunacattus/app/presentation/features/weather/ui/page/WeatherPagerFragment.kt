@@ -54,7 +54,7 @@ class WeatherPagerFragment : BaseWeatherFragment<FragmentWeatherPagerBinding>(
         ) {
             Logger.d(TAG, "collect weatherList, size=${it.size}")
             pagerAdapter.submitList(it)
-            setBackGround(it[0])
+            setBackGround(it[binding.viewPager.currentItem])
         }
 
         collectState<WeatherUiState.Success, String>(
@@ -85,6 +85,7 @@ class WeatherPagerFragment : BaseWeatherFragment<FragmentWeatherPagerBinding>(
     }
 
     private fun initViewPager() {
+        binding.viewPager.offscreenPageLimit = 1
         (binding.viewPager.getChildAt(0) as RecyclerView).apply {
             overScrollMode = View.OVER_SCROLL_NEVER
         }

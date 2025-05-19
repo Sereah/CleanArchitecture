@@ -29,6 +29,6 @@
     <string name="cancel">取消</string>
     <string name="add">添加</string>
     <string name="ok">好的</string>
-    <string name="location_permission_msg">天气信息需要使用GPS定位权限</string>
+    <string name="request_permission_msg">相关功能需要使用权限，请授权！</string>
     <string name="permission_goto_setting_msg">你需要在设置中手动打开相关权限</string>
 </resources>

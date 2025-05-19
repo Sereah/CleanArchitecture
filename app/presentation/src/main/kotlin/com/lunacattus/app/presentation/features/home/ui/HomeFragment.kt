@@ -85,7 +85,7 @@ class HomeFragment :
             .onExplainRequestReason { scope, deniedList ->
                 scope.showRequestReasonDialog(
                     deniedList,
-                    getString(R.string.location_permission_msg),
+                    getString(R.string.request_permission_msg),
                     getString(R.string.ok),
                     getString(R.string.cancel)
                 )

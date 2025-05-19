@@ -4,7 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/bg_cloudy_weather"
     tools:context="com.lunacattus.app.presentation.features.weather.ui.page.WeatherPagerFragment">
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:indeterminateDrawable="@drawable/style_progress"
+        android:indeterminateDuration="500"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/view_pager"
@@ -23,8 +35,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:tabBackground="@android:color/transparent"
         app:tabIndicator="@null"
-        app:tabIndicatorHeight="0dp"
         app:tabIndicatorColor="@android:color/transparent"
+        app:tabIndicatorHeight="0dp"
         app:tabPaddingEnd="3dp"
         app:tabPaddingStart="2dp"
         app:tabRippleColor="@android:color/transparent" />

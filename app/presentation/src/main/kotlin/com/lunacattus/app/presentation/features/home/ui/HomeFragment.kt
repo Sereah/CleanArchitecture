@@ -19,6 +19,7 @@ import com.lunacattus.clean.presentation.R
 import com.lunacattus.clean.presentation.databinding.FragmentHomeBinding
 import com.permissionx.guolindev.PermissionX
 import dagger.hilt.android.AndroidEntryPoint
+import java.lang.ref.WeakReference
 
 @AndroidEntryPoint
 class HomeFragment :
@@ -33,12 +34,10 @@ class HomeFragment :
     override fun setupViews(savedInstanceState: Bundle?) {
         Logger.d(TAG, "onViewCreated")
         setStatusBarColor()
-        featureAdapter = FeatureListAdapter { id ->
-            checkFeature(id)
-        }
+        featureAdapter = FeatureListAdapter(WeakReference(itemClickListener))
         binding.featureList.apply {
             adapter = featureAdapter
-            layoutManager = LinearLayoutManager(requireContext() )
+            layoutManager = LinearLayoutManager(requireContext())
         }
         initList()
     }
@@ -56,20 +55,32 @@ class HomeFragment :
 
     }
 
+    private val itemClickListener: (String) -> Unit = { id ->
+        checkFeature(id)
+    }
+
     private fun checkFeature(id: String) {
         when {
             id == FEATURE_WEATHER -> {
-                checkLocationPermission()
+                checkPermission(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                ) {
+                    MapsInitializer.updatePrivacyShow(requireContext(), true, true)
+                    MapsInitializer.updatePrivacyAgree(requireContext(), true)
+                    navCoordinator.execute(
+                        NavCommand.ToDirection(
+                            defaultNavDirection(R.id.action_home_to_weather)
+                        )
+                    )
+                }
             }
         }
     }
 
-    private fun checkLocationPermission() {
+    private fun checkPermission(vararg permission: String, success: () -> Unit) {
         PermissionX.init(this)
-            .permissions(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-            )
+            .permissions(permission.toList())
             .explainReasonBeforeRequest()
             .onExplainRequestReason { scope, deniedList ->
                 scope.showRequestReasonDialog(
@@ -89,13 +100,7 @@ class HomeFragment :
             }
             .request { allGranted, _, _ ->
                 if (allGranted) {
-                    MapsInitializer.updatePrivacyShow(requireContext(), true, true)
-                    MapsInitializer.updatePrivacyAgree(requireContext(), true)
-                    navCoordinator.execute(
-                        NavCommand.ToDirection(
-                            defaultNavDirection(R.id.action_home_to_weather)
-                        )
-                    )
+                    success()
                 }
             }
     }

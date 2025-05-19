@@ -40,13 +40,23 @@ class WeatherPagerFragment : BaseWeatherFragment<FragmentWeatherPagerBinding>(
     }
 
     override fun setupObservers() {
+        collectState<WeatherUiState.Loading> {
+            binding.progress.visibility = View.VISIBLE
+        }
+
+        collectState<WeatherUiState.Success> {
+            binding.progress.visibility = View.GONE
+        }
+
         collectState<WeatherUiState.Success, List<Weather>>(
             mapFn = { it.weatherList },
             filterFn = { it.isNotEmpty() },
         ) {
             Logger.d(TAG, "collect weatherList, size=${it.size}")
             pagerAdapter.submitList(it)
+            setBackGround(it[0])
         }
+
         collectState<WeatherUiState.Success, String>(
             mapFn = { it.selectedCityId },
             filterFn = { it.isNotEmpty() }

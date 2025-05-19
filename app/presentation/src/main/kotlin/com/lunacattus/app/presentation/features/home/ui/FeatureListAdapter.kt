@@ -8,8 +8,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.lunacattus.app.presentation.features.home.ui.FeatureListAdapter.Companion.FeatureItem
 import com.lunacattus.clean.presentation.databinding.ItemHomeFeatureBinding
 import com.lunacattus.common.setOnClickListenerWithDebounce
+import java.lang.ref.WeakReference
 
-class FeatureListAdapter(val onItemClick: (String) -> Unit) :
+class FeatureListAdapter(private val onItemClick: WeakReference<(String) -> Unit>) :
     ListAdapter<FeatureItem, FeatureListAdapter.FeatureViewHolder>(
         object : DiffUtil.ItemCallback<FeatureItem>() {
             override fun areItemsTheSame(
@@ -46,7 +47,7 @@ class FeatureListAdapter(val onItemClick: (String) -> Unit) :
         holder.binding.img.setImageResource(item.imgSource)
         holder.binding.title.text = item.name
         holder.binding.root.setOnClickListenerWithDebounce {
-            onItemClick(item.name)
+            onItemClick.get()?.invoke(item.name)
         }
     }
 

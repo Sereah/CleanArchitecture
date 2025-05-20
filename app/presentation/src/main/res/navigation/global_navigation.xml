@@ -15,7 +15,12 @@
             android:id="@+id/action_home_to_weather"
             app:destination="@id/weather_navigation" />
 
+        <action
+            android:id="@+id/action_home_to_connect"
+            app:destination="@id/connect_navigation" />
+
     </fragment>
 
     <include app:graph="@navigation/weather_navigation" />
+    <include app:graph="@navigation/connect_navigation" />
 </navigation>

@@ -75,6 +75,14 @@ class HomeFragment :
                     )
                 }
             }
+
+            id == FEATURE_CONNECT -> {
+                navCoordinator.execute(
+                    NavCommand.ToDirection(
+                        defaultNavDirection(R.id.action_home_to_connect)
+                    )
+                )
+            }
         }
     }
 
@@ -135,6 +143,12 @@ class HomeFragment :
                     desc = "一个简单的天气应用，数据来源‘和风天气’和‘高德地图’。",
                     imgSource = R.drawable.img_feature_weather,
                     bgSource = R.drawable.bg_feature_weather
+                ),
+                FeatureListAdapter.Companion.FeatureItem(
+                    name = FEATURE_CONNECT,
+                    desc = "",
+                    imgSource = R.drawable.img_feature_card_cat_two,
+                    bgSource = R.drawable.bg_feature_connect
                 )
             )
         )
@@ -143,6 +157,7 @@ class HomeFragment :
     companion object {
         const val TAG = "HomeFragment"
         const val FEATURE_WEATHER = "猫の天气"
+        const val FEATURE_CONNECT = "猫の连接"
     }
 
 }

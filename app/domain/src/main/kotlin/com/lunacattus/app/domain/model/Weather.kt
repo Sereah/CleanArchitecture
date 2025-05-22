@@ -1,6 +1,5 @@
 package com.lunacattus.app.domain.model
 
-import com.lunacattus.clean.domain.R
 import com.lunacattus.common.parseToTimestamp
 import java.time.ZoneId
 

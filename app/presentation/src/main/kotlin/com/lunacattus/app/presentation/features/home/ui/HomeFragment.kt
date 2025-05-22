@@ -60,8 +60,8 @@ class HomeFragment :
     }
 
     private fun checkFeature(id: String) {
-        when {
-            id == FEATURE_WEATHER -> {
+        when (id) {
+            FEATURE_WEATHER -> {
                 checkPermission(
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION,
@@ -76,12 +76,18 @@ class HomeFragment :
                 }
             }
 
-            id == FEATURE_CONNECT -> {
-                navCoordinator.execute(
-                    NavCommand.ToDirection(
-                        defaultNavDirection(R.id.action_home_to_connect)
+            FEATURE_CONNECT -> {
+                checkPermission(
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT,
+                    Manifest.permission.BLUETOOTH_ADVERTISE
+                ) {
+                    navCoordinator.execute(
+                        NavCommand.ToDirection(
+                            defaultNavDirection(R.id.action_home_to_connect)
+                        )
                     )
-                )
+                }
             }
         }
     }

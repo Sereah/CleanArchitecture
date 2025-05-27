@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.lunacattus.clean.presentation"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.lunacattus.clean.app"
@@ -85,6 +85,9 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.permissionx)
+
+    implementation(libs.androidx.navigation3.runtime)
+    implementation(libs.androidx.navigation3.ui)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

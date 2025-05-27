@@ -17,3 +17,9 @@ fun AppTheme(
     )
 
 }
+
+object AppTheme {
+    val colors: ColorScheme
+        @Composable
+        get() = LocalColorScheme.current
+}

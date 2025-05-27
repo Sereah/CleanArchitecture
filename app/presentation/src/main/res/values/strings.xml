@@ -1,34 +1,3 @@
 <resources>
     <string name="app_name">月亮与猫</string>
-    <string name="feature_chat">Feature Weather</string>
-    <string name="paris">Paris</string>
-    <string name="june_07">June 07</string>
-    <string name="update_time">Updated as of %s</string>
-    <string name="weather_clear">Clear</string>
-    <string name="temperature_24">24</string>
-    <string name="temperature_unit">°</string>
-    <string name="humidity">HUMIDITY</string>
-    <string name="wind">WIND</string>
-    <string name="feel">FEELS LIKE</string>
-    <string name="humidity_value">%d%%</string>
-    <string name="wind_value">%.2fkm/h</string>
-    <string name="feel_value">%d°</string>
-    <string name="today">今天</string>
-    <string name="empty_ad_code_exception">定位异常，请切换网络重试</string>
-    <string name="empty_weather_exception">获取天气信息异常，请切换网络重试</string>
-    <string name="network_fail_exception">网络异常，请稍后重试</string>
-    <string name="weather_fail_exception">网络请求异常: %s %s</string>
-    <string name="week">周%s</string>
-    <string name="temp_min_to_max">%d-%d°</string>
-    <string name="name_to_pName">%s-%s</string>
-    <string name="update">%s 更新</string>
-    <string name="city_option">城市管理</string>
-    <string name="search_hint">搜索位置</string>
-    <string name="current_location">当前定位</string>
-    <string name="added_city">已添加城市</string>
-    <string name="cancel">取消</string>
-    <string name="add">添加</string>
-    <string name="ok">好的</string>
-    <string name="request_permission_msg">相关功能需要使用权限，请授权！</string>
-    <string name="permission_goto_setting_msg">你需要在设置中手动打开相关权限</string>
 </resources>

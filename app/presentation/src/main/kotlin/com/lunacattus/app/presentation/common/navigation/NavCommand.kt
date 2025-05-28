@@ -18,6 +18,15 @@ sealed class NavCommand {
             }
         }
 
+        val lastHoldNavOptions = navOptions {
+            anim {
+                enter = R.anim.slide_in_right
+                exit = R.anim.hold
+                popEnter = R.anim.hold
+                popExit = R.anim.slide_out_right
+            }
+        }
+
         fun defaultNavDirection(actionId: Int) = object : NavDirections {
             override val actionId: Int
                 get() = actionId

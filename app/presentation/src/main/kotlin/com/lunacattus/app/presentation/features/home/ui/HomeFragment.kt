@@ -5,10 +5,12 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.WindowInsetsController
 import androidx.fragment.app.viewModels
+import androidx.navigation.navOptions
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.amap.api.maps.MapsInitializer
 import com.lunacattus.app.presentation.common.navigation.NavCommand
 import com.lunacattus.app.presentation.common.navigation.NavCommand.Companion.defaultNavDirection
+import com.lunacattus.app.presentation.common.navigation.NavCommand.Companion.lastHoldNavOptions
 import com.lunacattus.app.presentation.common.ui.base.BaseFragment
 import com.lunacattus.app.presentation.features.home.mvi.HomeSideEffect
 import com.lunacattus.app.presentation.features.home.mvi.HomeUiIntent
@@ -70,7 +72,8 @@ class HomeFragment :
                     MapsInitializer.updatePrivacyAgree(requireContext(), true)
                     navCoordinator.execute(
                         NavCommand.ToDirection(
-                            defaultNavDirection(R.id.action_home_to_weather)
+                            defaultNavDirection(R.id.action_home_to_weather),
+                            options = lastHoldNavOptions
                         )
                     )
                 }
@@ -84,7 +87,8 @@ class HomeFragment :
                 ) {
                     navCoordinator.execute(
                         NavCommand.ToDirection(
-                            defaultNavDirection(R.id.action_home_to_connect)
+                            defaultNavDirection(R.id.action_home_to_connect),
+                            options = lastHoldNavOptions
                         )
                     )
                 }

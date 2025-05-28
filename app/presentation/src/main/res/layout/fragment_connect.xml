@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#ffffff"
     tools:context="com.lunacattus.app.presentation.features.connect.ui.ConnectFragment">
 
     <androidx.appcompat.widget.SwitchCompat

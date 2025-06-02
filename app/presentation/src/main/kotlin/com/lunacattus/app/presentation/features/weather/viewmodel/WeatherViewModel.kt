@@ -111,10 +111,11 @@ class WeatherViewModel @Inject constructor(
             queryAllWeatherUseCase.invoke().onSuccess { flow ->
                 flow.filter { it.isNotEmpty() }.distinctUntilChanged().collect { weather ->
                     Logger.d(TAG, "query all weather: ${weather.size}")
+                    val sortWeatherList = weather.sortedBy { !it.nowWeather.isCurrentLocation }
                     updateUiState { current ->
                         when (current) {
-                            is WeatherUiState.Success -> current.copy(weatherList = weather)
-                            else -> WeatherUiState.Success(weatherList = weather)
+                            is WeatherUiState.Success -> current.copy(weatherList = sortWeatherList)
+                            else -> WeatherUiState.Success(weatherList = sortWeatherList)
                         }
                     }
                 }
